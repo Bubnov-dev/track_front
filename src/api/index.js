@@ -56,7 +56,57 @@ export default {
     },
 
     task: {
+        create(task) {
+            return axios.post('/task', task);
+        },
 
+        update(task) {
+            return axios.update('/task', task);
+        },
+
+        get(id) {
+            return axios.get('/task', {
+                params: {
+                    id: id
+                }
+            });
+        },
+
+        delete(id) {
+            return axios.delete('/task', {
+                id: id
+            });
+        },
+
+
+        inviteUser(id, user_id) {
+            return axios.post('/managerUser', {
+                id,
+                user_id,
+            });
+        },
+
+        removeUser(id, user_id) {
+            return axios.delete('/managerUser', {
+                id,
+                user_id,
+            });
+        },
+        
+        nextStatus(task_id) {
+            return axios.post('/nextStatus', {
+                task_id
+            });
+        },
+
+        changeStatus(task_id, status_order) {
+            return axios.post('/changeStatus', {
+                task_id,
+                status_order
+            });
+        },
+        
+        
     },
 
     user: {

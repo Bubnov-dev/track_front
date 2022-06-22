@@ -1,0 +1,25 @@
+@import "base.sass"
+.center-block 
+    padding: 20px
+    margin: auto
+    width: 400px
+    max-width: 90vw
+
+    // box-shadow: 10px 5px 5px rgba(9,9,9,0.3)
+
+    .btn-primary
+        place-self: center
+
+
+.tabs
+    display: grid
+    grid-template-columns: 1fr 1fr
+
+    font-weight: bold
+    // gap: 40px
+    &__item
+        border-bottom: 4px solid $secondary-light
+        text-align: center
+        padding: 10px
+        &.active
+            border-color: $secondary
