@@ -70,7 +70,7 @@ label.wrapper
         grid-row: 1/2
         outline: none !important
 
-        &:focus
+        &:focus, &:not(:placeholder-shown)
             &+.placeholder
                 margin-top: -2.8rem
                 background: $card
