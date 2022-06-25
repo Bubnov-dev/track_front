@@ -1,0 +1,66 @@
+@import "vars"
+
+.base-layout
+    height: 100vh
+    display: grid
+    grid-template-columns: 360px 1fr
+    color: white
+
+    &>*
+        width: 100%
+        min-width: 0
+    &__menu
+        background: $dark
+
+    &__content
+        padding: 20px 0px 20px 70px
+        max-height: 100vh
+        box-sizing: border-box
+        @include vertical
+
+.main-menu
+    @include vertical
+    gap: 42px
+    padding: 100px 27px
+    
+    &__title
+        display: flex
+        align-items: center
+        gap: 30px
+        
+        font-size: 32px
+        font-weight: 700
+        line-height: 38px
+        color: white
+        
+
+    &__childs
+        color: $secondary
+        padding-left: 7px
+        @include vertical
+        gap: 15px
+
+        max-height: 0
+        margin-top: 0
+        overflow: hidden
+        transition: .3s
+
+    &__btn
+        transition: .3s
+        display: grid
+        border: none
+        background: none
+        cursor: pointer
+        padding: 5px
+
+    &__item
+
+        &.open
+            .main-menu__childs
+                max-height: 500px
+                margin-top: 17px
+
+            .main-menu__btn
+                transform: rotate(180deg)
+
+        

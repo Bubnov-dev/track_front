@@ -1,19 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap')
     
-$primary: #63836B
-$secondary: #B46E4C
-$secondary-light: #B56D4C78
-$dark: #242424
-$yellow: #EAB651
-$card: #FFF1DE
-$border: #ccc
+@import "vars"
+
+#app
+    height: 100vh
 
 .hidden
     display: none !important
 
-@mixin vertical
-    display: flex
-    flex-direction: column
+button
+    outline: none !important
+    border: none
+
 
 *
     box-sizing: border-box
@@ -25,6 +23,13 @@ body
     margin: 0
     color: #333
 
+.flex
+    display: flex
+    &.right
+        place-items: end
+
+
+
 main.center
     display: grid
     height: 100vh
@@ -33,7 +38,7 @@ main.center
 .card
     border-radius: 12px
     background: $card
-
+    color: $dark
     &__header
         // border-bottom: 1px solid $border
         color: $secondary
@@ -92,3 +97,38 @@ form
     @include vertical
     gap: 20px
     
+
+.up-menu
+    @include flex-right
+    gap: 20px
+    margin: 40px 0 70px
+    padding: 0 70px
+    width: auto
+
+
+.checkbox-wrapper
+    display: flex
+    gap: 12px
+    align-items: center
+    .fake-checkbox
+        border-radius: 50%
+        width: 16px
+        height: 16px
+        border: 1px solid #63836B80
+        display: grid
+        place-items: center
+        transition: .3s
+        padding: 3px
+
+    input
+        display: none
+        &:checked
+            &+.fake-checkbox
+                content: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11.0253 0.641394C11.2694 0.885472 11.2694 1.2812 11.0253 1.52528L5.19194 7.35861C4.94786 7.60269 4.55214 7.60269 4.30806 7.35861L0.974725 4.02528C0.730648 3.7812 0.730648 3.38547 0.974725 3.14139C1.2188 2.89732 1.61453 2.89732 1.85861 3.14139L4.75 6.03279L10.1414 0.641394C10.3855 0.397316 10.7812 0.397316 11.0253 0.641394Z' fill='%23FFF1DE'/%3E%3C/svg%3E")
+                background: #83c36B
+                border-color: #83c36B
+
+.task
+    display: flex
+    gap: 10px 
+    align-items: center
