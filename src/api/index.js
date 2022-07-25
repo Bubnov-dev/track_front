@@ -32,6 +32,10 @@ export default {
             });
         },
 
+        my(){
+            return axios.get('/project/my')
+        },
+
         delete(id) {
             return axios.delete('/project', {
                 id: id

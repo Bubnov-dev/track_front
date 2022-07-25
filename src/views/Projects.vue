@@ -91,12 +91,32 @@
 
 <script>
 import CheckboxView from "../components/CheckboxView.vue";
+import api from "../api"
 
 export default {
     name: 'projects',
 
     components: {
         CheckboxView
+    },
+
+    data: function(){
+        return {
+            projects: []
+        }
+    },
+
+    mounted(){
+        api.project.my().then((response)=> {
+            this.projects = response.data
+        })
+
+    },
+
+    methods(){
+        return {
+        }
+
     }
 }
 
