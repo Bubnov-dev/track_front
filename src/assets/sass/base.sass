@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap')
-    
+
 @import "vars"
 
 #app
@@ -18,16 +18,16 @@ button
 
 body
     font-family: 'Lato', sans-serif
-    font-size: 24px 
+    font-size: 24px
     background: $primary
     margin: 0
     color: #333
 
 .flex
     display: flex
+
     &.right
         place-items: end
-
 
 
 main.center
@@ -39,6 +39,7 @@ main.center
     border-radius: 12px
     background: $card
     color: $dark
+
     &__header
         // border-bottom: 1px solid $border
         color: $secondary
@@ -49,7 +50,7 @@ main.center
         padding-top: 15px
 
 input
-    background: rgba(0,0,0,0)
+    background: rgba(0, 0, 0, 0)
     border: 2px solid $primary
     padding: 15px
     border-radius: 8px
@@ -60,6 +61,7 @@ label.wrapper
     grid-template-columns: 100%
     gap: 15px
     align-items: center
+    position: relative
 
     .placeholder
         grid-column: 1/2
@@ -76,7 +78,7 @@ label.wrapper
         outline: none !important
 
         &:focus, &:not(:placeholder-shown)
-            &+.placeholder
+            & + .placeholder
                 margin-top: -2.8rem
                 background: $card
                 font-size: .7rem
@@ -86,6 +88,7 @@ label.wrapper
     border-radius: 25px
     padding: 5px
     font-size: 1.2rem
+
     &-primary
         padding: .5rem 2.1rem
         background: $secondary
@@ -97,7 +100,7 @@ label.wrapper
 form
     @include vertical
     gap: 20px
-    
+
 
 .up-menu
     @include flex-right
@@ -111,6 +114,7 @@ form
     display: flex
     gap: 12px
     align-items: center
+
     .fake-checkbox
         border-radius: 50%
         width: 16px
@@ -123,13 +127,28 @@ form
 
     input
         display: none
+
         &:checked
-            &+.fake-checkbox
+            & + .fake-checkbox
                 content: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11.0253 0.641394C11.2694 0.885472 11.2694 1.2812 11.0253 1.52528L5.19194 7.35861C4.94786 7.60269 4.55214 7.60269 4.30806 7.35861L0.974725 4.02528C0.730648 3.7812 0.730648 3.38547 0.974725 3.14139C1.2188 2.89732 1.61453 2.89732 1.85861 3.14139L4.75 6.03279L10.1414 0.641394C10.3855 0.397316 10.7812 0.397316 11.0253 0.641394Z' fill='%23FFF1DE'/%3E%3C/svg%3E")
                 background: #83c36B
                 border-color: #83c36B
 
 .task
     display: flex
-    gap: 10px 
+    gap: 10px
     align-items: center
+
+.tooltip
+    position: absolute
+    top: 90%
+    z-index: 10
+    padding: 10px
+    font-size: 12px
+    line-height: 14px
+    border-radius: 5px
+
+    &--error
+        background-color: red
+        opacity: 0.8
+        color: white

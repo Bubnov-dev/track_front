@@ -1,37 +1,36 @@
 <template>
-
-    <label class="wrapper">
-        <input :type="type" placeholder=" " @input="$emit('update:modelValue', $event.target.value)">
-        <div class="placeholder">
-            {{ placeholder }}
-        </div>
-    </label>
+  <label class="wrapper">
+    <input :type="type" placeholder=" " @input="$emit('update:modelValue', $event.target.value)">
+    <div class="placeholder">
+      {{ placeholder }}
+    </div>
+    <transition name="bounce">
+    <div class="tooltip tooltip--error" v-if="error">{{ error }}</div>
+    </transition>
+  </label>
 </template>
 
 <script>
 export default {
+  name: 'input-view',
 
-    name: 'input-view',
+  emits: ['update:value'],
 
-
-    emits: ['update:value'],
-
-    props: {
-        value: String,
-        placeholder: String,
-        type: {
-            type: String,
-            default: 'text'
-        },
+  props: {
+    value: String,
+    placeholder: String,
+    type: {
+      type: String,
+      default: 'text'
     },
-  
-    
-    
-    methods: {
-        handleInput(e) {
-            this.$emit('input', this.content)
-        }
+    error: String,
+  },
+
+  methods: {
+    handleInput(e) {
+      this.$emit('input', this.content)
     }
+  }
 
 
 }
