@@ -6,31 +6,26 @@
           <div class="tabs__item" :class="{ 'active': (tab_selected == 'login') }" @click="tab_selected='login'">Вход
           </div>
           <div class="tabs__item" :class="{ 'active': (tab_selected == 'register') }"
-               @click="tab_selected = 'register'">Регистрация
-          </div>
+            @click="tab_selected = 'register'">Регистрация</div>
         </div>
       </div>
       <div class="card__content">
         <form v-if="tab_selected == 'login'" action="">
 
-          <InputView placeholder="E-mail" v-model="user.email"
-                     :error="v$.user.email.$errors.length ? v$.user.email.$errors[0].$message : ''"/>
-          <InputView placeholder="Пароль" v-model="user.password"
-                     :error="v$.user.password.$errors.length ? v$.user.password.$errors[0].$message : ''"/>
+          <InputView placeholder="E-mail" v-model="user.email" />
+          <InputView placeholder="Пароль" v-model="user.password" />
+
           <div class="btn btn-primary" @click="login">
             Вход
           </div>
         </form>
 
         <form v-if="tab_selected == 'register'" action="">
-          <InputView placeholder="Имя" v-model="reg_user.name"
-                     :error="v$.reg_user.name.$errors.length ? v$.reg_user.name.$errors[0].$message : ''"/>
-          <InputView placeholder="E-mail" v-model="reg_user.email"
-                     :error="v$.reg_user.email.$errors.length ? v$.reg_user.email.$errors[0].$message : ''"/>
-          <InputView placeholder="Пароль" v-model="reg_user.password"
-                     :error="v$.reg_user.password.$errors.length ? v$.reg_user.password.$errors[0].$message : ''"/>
-          <InputView placeholder="Повторите пароль" v-model="reg_user.password_confirmation"
-                     :error="v$.reg_user.password_confirmation.$errors.length ? v$.reg_user.password_confirmation.$errors[0].$message : ''"/>
+          <InputView placeholder="Имя" v-model="reg_user.name" />
+          <InputView placeholder="E-mail" v-model="reg_user.email" />
+          <InputView placeholder="Пароль" v-model="reg_user.password" />
+          <InputView placeholder="Повторите пароль" v-model="reg_user.password_confirmation" />
+
 
           <div class="btn btn-primary" @click="register">
             Регистрация
@@ -42,25 +37,20 @@
 </template>
 
 <script>
-import {mapGetters, mapActions, mapMutations} from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import InputView from "@/components/InputView.vue";
 import api from "../api"
-
-import useValidate from '@vuelidate/core'
-import {required, email, minLength, requiredIf, sameAs} from '@vuelidate/validators'
 
 export default {
   name: 'login-page',
 
   components: {
-    InputView,
+    InputView
   },
 
   data: function () {
     return {
       tab_selected: 'login',
-
-      v$: useValidate(),
 
       user: {
         email: '',
@@ -75,47 +65,23 @@ export default {
       }
     }
   },
-  validations() {
-    return {
-      user: {
-        email: {required, email},
-        password: {required},
-      },
-      reg_user: {
-        name: {required},
-        email: {required, email},
-        password: {required, minLength: minLength(8),},
-        password_confirmation: {requiredIf, sameAs: sameAs(this.reg_user.password)},
-      }
-    }
-  },
 
   methods: {
     ...mapActions(['setApiToken']),
     login() {
-      this.v$.user.$validate() // checks all inputs
-      if (!this.v$.user.$errors.length) {
-        api.user.login(this.user).then((msg) => {
-          console.log(msg)
-          this.setApiToken(msg.data.token)
-        }).catch(function (msg) {
-          console.log(msg)
-        })
-      } else {
-        //fail validation
-        console.log(this.v$.errors)
-      }
-
+      api.user.login(this.user).then( (msg) => {
+        console.log(msg)
+        this.setApiToken(msg.data.token)
+      }).catch(function (msg) {
+        console.log(msg)
+      })
     },
     register() {
-      this.v$.reg_user.$validate() // checks all inputs
-      if (!this.v$.reg_user.$errors.length) {
-        api.user.register(this.reg_user).then(function (msg) {
-          console.log(msg)
-        }).catch(function (msg) {
-          console.log(msg)
-        })
-      }
+      api.user.register(this.reg_user).then(function (msg) {
+        console.log(msg)
+      }).catch(function (msg) {
+        console.log(msg)
+      })
     }
   }
 }
@@ -124,6 +90,6 @@ export default {
 </script>
 
 <style lang="sass">
-@import "../assets/sass/login"
+  @import "../assets/sass/login"
 
 </style>

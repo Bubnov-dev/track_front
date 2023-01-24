@@ -20,7 +20,7 @@
     &>*
         flex-shrink: 0
 
-.project
+.project-item
     padding: 20px 30px
     width: 452px
     max-width: 80vw
@@ -33,4 +33,21 @@
         @include vertical
         gap: 12px
 
-    
+.project
+    &__statuses
+        height: 100%
+        display: flex
+        gap: 60px
+        overflow-x: auto
+        padding-bottom: 20px
+
+    &__status
+        min-width: 420px
+        border-right: 2px solid white
+        height: auto
+
+        min-height: 0
+        @include thinScroll
+        padding-right: 40px
+        &>*
+            flex-shrink: 0

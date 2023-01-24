@@ -1,55 +1,25 @@
 <template>
-    <div class="projects">
+    <div class="project-items">
 
         <div class="up-menu">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" @click="testModal = true">
                 Добавить проект
             </button>
         </div>
-        <div class="project-list">
-            <div class="card project">
-                <h3 class="project__title">project1</h3>
+        <div class="project-item-list">
 
-                <div class="project__tasks">
-                    <div class="task">
-                        task1
-                    </div>
-                    <div class="task">
-                        task2
-                    </div>
-                </div>
-            </div>
-            <div class="card project">
-                <h3 class="project__title">project1</h3>
+            <div class="card project" v-for="project in projects" :key="project.id">
+                <h3 class="project-item__title"><router-link :to="{name : 'project', params: {id : project.id}}">{{ project.name }}</router-link></h3>
 
-                <div class="project__tasks">
-                    <div class="task">
+                <div class="project-item__tasks">
+                    <div class="task" v-for="task in project.tasks" :key="task.id">
                         <label class="checkbox-wrapper">
                             <input type="checkbox">
                             <div class="fake-checkbox">
 
                             </div>
                         </label>
-                        task1
-                    </div>
-                    <div class="task">
-                        <checkbox-view>label </checkbox-view>
-                        task2
-                    </div>
-                </div>
-            </div>
-            <div class="card project">
-                <h3 class="project__title">project1</h3>
-
-                <div class="project__tasks">
-                    <div class="task">
-                        <label class="checkbox-wrapper">
-                            <input type="checkbox">
-                            <div class="fake-checkbox">
-
-                            </div>
-                        </label>
-                        task1
+                        {{ task.name }}
                     </div>
                     <div class="task">
                         <label class="checkbox-wrapper">
@@ -79,49 +49,64 @@
                         task1
                     </div>
                     <div class="task">
-                        <checkbox-view>label </checkbox-view>
+                        <checkbox-view>label</checkbox-view>
                         task2
                     </div>
                 </div>
             </div>
         </div>
+        <modal-view v-model="testModal">
+            <h2 class="h2">Новый проект</h2>
+            <form @submit.prevent="createProject">
+                <input type="text" v-model="newProject.name">
+                <button class="btn btn-primary">Сохранить</button>
+            </form>
+
+        </modal-view>
     </div>
 
 </template>
 
 <script>
 import CheckboxView from "../components/CheckboxView.vue";
-import api from "../api"
+import ModalView from "../components/ModalView.vue";
+import api from "@/api"
 
 export default {
     name: 'projects',
 
     components: {
-        CheckboxView
+        CheckboxView,
+        ModalView
     },
 
-    data: function(){
+    data: function () {
         return {
-            projects: []
+            projects: [],
+            testModal: false,
+            newProject: {}
         }
     },
 
-    mounted(){
-        api.project.my().then((response)=> {
-            this.projects = response.data
+    mounted() {
+        api.project.my().then((msg) => {
+            this.projects = msg.data
         })
-
     },
 
-    methods(){
-        return {
+    methods: {
+        createProject(){
+            api.project.create(this.newProject).then(response => {
+                console.log(response.data)
+            }).catch(error => {
+                console.log(error)
+            })
         }
-
     }
 }
 
 </script>
 
 <style lang="sass">
-    @import "@/assets/sass/projects"
+@import "@/assets/sass/projects"
 </style>

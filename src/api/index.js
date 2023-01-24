@@ -9,9 +9,9 @@ export default {
     setApiToken(token) {
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     },
-    
+
     removeApiToken() {
-        axios.defaults.headers.common['Authorization'] = '';        
+        axios.defaults.headers.common['Authorization'] = '';
     },
 
     project: {
@@ -32,8 +32,8 @@ export default {
             });
         },
 
-        my(){
-            return axios.get('/project/my')
+        my() {
+            return axios.get('/project/my');
         },
 
         delete(id) {
@@ -105,7 +105,7 @@ export default {
                 user_id,
             });
         },
-        
+
         nextStatus(task_id) {
             return axios.post('/nextStatus', {
                 task_id
@@ -118,8 +118,8 @@ export default {
                 status_order
             });
         },
-        
-        
+
+
     },
 
     user: {
