@@ -1,6 +1,7 @@
 // import Vue from 'vue'
 // import Vuex from 'vuex'
 import auth from './modules/auth'
+import base from './modules/base'
 import { createStore } from 'vuex'
 
 // Vue.use(Vuex)
@@ -13,6 +14,7 @@ import { createStore } from 'vuex'
 
 export default createStore({
   modules: {
-    auth: auth
+    auth: auth,
+    base: base
   }
 });

@@ -6,13 +6,13 @@
                 Добавить проект
             </button>
         </div>
-        <div class="project-item-list">
+        <div class="project-list">
 
-            <div class="card project" v-for="project in projects" :key="project.id">
+            <div class="card project-item" v-for="project in projects" :key="project.id">
                 <h3 class="project-item__title"><router-link :to="{name : 'project', params: {id : project.id}}">{{ project.name }}</router-link></h3>
 
                 <div class="project-item__tasks">
-                    <div class="task" v-for="task in project.tasks" :key="task.id">
+                    <div class="task" v-for="task in project.last_tasks" :key="task.id">
                         <label class="checkbox-wrapper">
                             <input type="checkbox">
                             <div class="fake-checkbox">
@@ -21,37 +21,7 @@
                         </label>
                         {{ task.name }}
                     </div>
-                    <div class="task">
-                        <label class="checkbox-wrapper">
-                            <input type="checkbox">
-                            <div class="fake-checkbox">
 
-                            </div>
-                        </label>
-                        task1
-                    </div>
-                    <div class="task">
-                        <label class="checkbox-wrapper">
-                            <input type="checkbox">
-                            <div class="fake-checkbox">
-
-                            </div>
-                        </label>
-                        task1
-                    </div>
-                    <div class="task">
-                        <label class="checkbox-wrapper">
-                            <input type="checkbox">
-                            <div class="fake-checkbox">
-
-                            </div>
-                        </label>
-                        task1
-                    </div>
-                    <div class="task">
-                        <checkbox-view>label</checkbox-view>
-                        task2
-                    </div>
                 </div>
             </div>
         </div>
@@ -71,9 +41,10 @@
 import CheckboxView from "../components/CheckboxView.vue";
 import ModalView from "../components/ModalView.vue";
 import api from "@/api"
+import {mapActions} from "vuex";
 
 export default {
-    name: 'projects',
+    name: 'projects-view',
 
     components: {
         CheckboxView,
@@ -89,12 +60,15 @@ export default {
     },
 
     mounted() {
+        this.setTitle('Проекты')
         api.project.my().then((msg) => {
             this.projects = msg.data
         })
     },
 
     methods: {
+        ...mapActions(['setTitle']),
+
         createProject(){
             api.project.create(this.newProject).then(response => {
                 console.log(response.data)

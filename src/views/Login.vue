@@ -72,6 +72,7 @@ export default {
       api.user.login(this.user).then( (msg) => {
         console.log(msg)
         this.setApiToken(msg.data.token)
+          this.$router.push({name: 'projects'})
       }).catch(function (msg) {
         console.log(msg)
       })

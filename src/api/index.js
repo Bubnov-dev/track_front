@@ -1,5 +1,5 @@
 import axios from "axios"
-import { mapGetters, mapActions } from "vuex";
+import {mapGetters, mapActions} from "vuex";
 
 axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // axios.defaults.headers.common['Authorization'] = 'Bearer 1|VeZIwdWDAeGQehhQQKPGzTv7fNmTVxzIoCsmKOry';
@@ -12,6 +12,10 @@ export default {
 
     removeApiToken() {
         axios.defaults.headers.common['Authorization'] = '';
+    },
+
+    getTimer() {
+        return axios.get('/timer');
     },
 
     project: {
@@ -107,7 +111,7 @@ export default {
         },
 
         nextStatus(task_id) {
-            return axios.post('/nextStatus', {
+            return axios.post('task/nextStatus', {
                 task_id
             });
         },
@@ -119,7 +123,35 @@ export default {
             });
         },
 
+        startTimer(task_id) {
+            return axios.post('task/startTimer', {
+                'id': task_id
+            })
+        },
 
+        stopTimer() {
+            return axios.post('task/stopTimer');
+        }
+
+
+    },
+
+    timer: {
+        start(task_id, project_id = null) {
+            return axios.post('/timer/start');
+        },
+
+        stop() {
+            return axios.post('/timer/stop');
+        },
+
+        updateTiming(timeToAppend, task_id, project_id=null){
+            return axios.post('/updateTiming', {
+                timeToAppend,
+                task_id,
+                project_id
+            })
+        }
     },
 
     user: {

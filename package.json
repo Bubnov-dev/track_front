@@ -14,7 +14,8 @@
     "postcss-import": "^14.1.0",
     "vue": "^3.2.36",
     "vue-router": "^4.0.15",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
