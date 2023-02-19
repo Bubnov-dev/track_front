@@ -7,6 +7,9 @@ export default {
       localStorage.setItem('token', token)
       api.setApiToken(token)
       return ctx.commit('setApiToken', token)
+    },
+    setUser(ctx, name){
+      return ctx.commit('setUserName', name)
     }
   },
   mutations: {
@@ -14,17 +17,26 @@ export default {
       state.token = token
 
     },
+    setUserName(state, name){
+      state.user.name = name
+    },
 
     deleteApiToken(state) {
       state.token = ""
     },
   },
   state: {
-    token: ""
+    token: "",
+    user:{
+      name: ''
+    }
   },
   getters: {
     getApiToken(state) {
       return state.token
     },
+    getUser(state){
+      return state.user
+    }
   }
 }

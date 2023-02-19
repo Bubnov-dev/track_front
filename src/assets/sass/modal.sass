@@ -1,18 +1,29 @@
+@import "vars"
+
 .modal-wrapper
     display: none
     position: fixed
+    z-index: 100
     width: 100vw
     height: 100vh
     top: 0
     left: 0
+    background: #000a
+
 
     .modal
+        padding: 30px 40px
+        min-width: 350px
+        width: fit-content
+        background: $secondary
+        border-radius: 5px
         position: absolute
-        top: 20vh
-        left: 10vw
-        width: 80vw
-        height: 60vh
-        padding: 20px
+
+        &__close
+            position: absolute
+            top: 20px
+            right: 20px
 
     &.open
-        display: block
+        display: grid
+        place-items: center

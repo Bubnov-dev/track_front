@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import Toast from "vue-toastification";
+import ModalComponent from "@/components/ModalComponent.vue";
 import { useToast } from "vue-toastification";
 
 const options = {
@@ -15,5 +16,6 @@ app.use(router)
 app.use(store)
 app.use(useToast)
 app.use(Toast, options);
+app.component('modal-component', ModalComponent)
 
 app.mount('#app')

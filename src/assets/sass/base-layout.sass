@@ -12,22 +12,25 @@
   &__menu
 
     background: $primary
-    border-right: 14px solid $dark
+    color: $secondary
+    //border-right: 14px solid $primary
 
 
   &__header
     width: 100%
-    background: $primary
-    background: $dark
+    background: $secondary
+    border-bottom: 5px solid $middle
 
-    padding: 10px 20px
+    padding: 5px 50px
     display: flex
     align-items: center
     gap: 40px
-    color: white
+    //color: white
     h2
       margin: 15px 0
       font-size: 32px
+    &-profile
+      margin-left: auto
 
 
   &__content
@@ -43,6 +46,8 @@
 
   &__logo
     max-width: 100%
+    color: inherit
+    text-decoration: none
     img
       width: 100%
 
@@ -55,6 +60,9 @@
     font-weight: 700
     line-height: 1.2
     //color: white
+    a
+      color: $secondary
+      text-decoration: none
 
 
   &__childs

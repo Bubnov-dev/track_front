@@ -23,10 +23,11 @@ const router = createRouter({
           component: ProjectsView
         },
         {
-          path: '/:id',
+          path: 'projects/:id',
           name: 'project',
           component: ProjectView
-        }
+        },
+
       ]
     }
   ]

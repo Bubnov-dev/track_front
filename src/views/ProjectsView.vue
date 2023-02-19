@@ -9,11 +9,38 @@
         <div class="project-list">
 
             <div class="card project-item" v-for="project in projects" :key="project.id">
+                <div class="flex justify-content-between">
+
                 <h3 class="project-item__title"><router-link :to="{name : 'project', params: {id : project.id}}">{{ project.name }}</router-link></h3>
+                    <div class="tooltip">
+
+                    <button class="project__task-additional tooltip-btn btn">
+                        <svg width="4" height="16" viewBox="0 0 4 16" fill="none"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M2 12C2.53043 12 3.03914 12.2107 3.41421 12.5858C3.78929 12.9609 4 13.4696 4 14C4 14.5304 3.78929 15.0391 3.41421 15.4142C3.03914 15.7893 2.53043 16 2 16C1.46957 16 0.96086 15.7893 0.585787 15.4142C0.210714 15.0391 0 14.5304 0 14C0 13.4696 0.210714 12.9609 0.585787 12.5858C0.96086 12.2107 1.46957 12 2 12ZM2 6C2.53043 6 3.03914 6.21071 3.41421 6.58579C3.78929 6.96086 4 7.46957 4 8C4 8.53043 3.78929 9.03914 3.41421 9.41421C3.03914 9.78929 2.53043 10 2 10C1.46957 10 0.96086 9.78929 0.585787 9.41421C0.210714 9.03914 0 8.53043 0 8C0 7.46957 0.210714 6.96086 0.585787 6.58579C0.96086 6.21071 1.46957 6 2 6ZM2 0C2.53043 0 3.03914 0.210714 3.41421 0.585786C3.78929 0.960859 4 1.46957 4 2C4 2.53043 3.78929 3.03914 3.41421 3.41421C3.03914 3.78929 2.53043 4 2 4C1.46957 4 0.96086 3.78929 0.585787 3.41421C0.210714 3.03914 0 2.53043 0 2C0 1.46957 0.210714 0.960859 0.585787 0.585786C0.96086 0.210714 1.46957 0 2 0Z"
+                                fill="black"/>
+                        </svg>
+                    </button>
+                    <div class="tooltip-menu">
+
+                        <div class="project__additional-menu card" onclick="event.stopPropagation()">
+                            <div class="project__additional-menu-item">
+                                <button class="btn" @click="deleteProject(project.id)">Удалить</button>
+                            </div>
+                            <div class="project__additional-menu-item" @click="">
+                                <button class="btn">Отредактировать</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
 
                 <div class="project-item__tasks">
                     <div class="task" v-for="task in project.last_tasks" :key="task.id">
                         <label class="checkbox-wrapper">
+                            <input type="checkbox">
                             <input type="checkbox">
                             <div class="fake-checkbox">
 
@@ -25,37 +52,71 @@
                 </div>
             </div>
         </div>
-        <modal-view v-model="testModal">
-            <h2 class="h2">Новый проект</h2>
+        <modal-component v-model="testModal" title="Новый проект">
             <form @submit.prevent="createProject">
                 <input type="text" v-model="newProject.name">
+                <draggable
+                    :list="newProject.statuses"
+                    :disabled="!enabled"
+                    item-key=""
+                    class="list-group"
+                    ghost-class="ghost"
+                    @end="renewOrders"
+                >
+                    <template #item="{ element, idx }">
+                        <div class="p-2 border border-3 flex" :class="{ 'not-draggable': !enabled }">
+                            {{element.order}}
+                            <input type="text" v-model="element.name">
+                            <div class="btn btn-primary" @click="newProject.statuses.splice(idx, 1)">-</div>
+                        </div>
+                    </template>
+                </draggable>
+                <div @click.stop="newProject.statuses.push({})">+</div>
                 <button class="btn btn-primary">Сохранить</button>
             </form>
 
-        </modal-view>
+        </modal-component>
     </div>
 
 </template>
 
 <script>
 import CheckboxView from "../components/CheckboxView.vue";
-import ModalView from "../components/ModalView.vue";
+import ModalComponent from "@/components/ModalComponent.vue";
 import api from "@/api"
 import {mapActions} from "vuex";
+import vuedraggable from "vuedraggable/src/vuedraggable";
+import {useToast} from "vue-toastification";
 
 export default {
     name: 'projects-view',
 
     components: {
         CheckboxView,
-        ModalView
+        ModalComponent,
+
+        draggable: vuedraggable
     },
 
     data: function () {
         return {
             projects: [],
             testModal: false,
-            newProject: {}
+            newProject: {
+                statuses: [
+                    // { name: "John", id: 0 },
+                    // { name: "Joao", id: 1 },
+                    // { name: "Jean", id: 2 }
+                ]
+            },
+
+            enabled: true,
+            list: [
+                { name: "John", id: 0 },
+                { name: "Joao", id: 1 },
+                { name: "Jean", id: 2 }
+            ],
+            dragging: false
         }
     },
 
@@ -70,12 +131,26 @@ export default {
         ...mapActions(['setTitle']),
 
         createProject(){
+            for(let i = 0; i < this.newProject.statuses.length; i++){
+                this.newProject.statuses[i].order = i+1
+            }
             api.project.create(this.newProject).then(response => {
                 console.log(response.data)
+                this.projects.push(response.data)
             }).catch(error => {
                 console.log(error)
             })
+        },
+
+        deleteProject(id){
+            api.project.delete(id).then(response => {
+                this.projects = this.projects.filter(el => el.id !== id)
+            }).catch(error => {
+                console.log(error)
+                useToast().error('Ошибка удаления')
+            })
         }
+
     }
 }
 

@@ -1,7 +1,8 @@
 import axios from "axios"
 import {mapGetters, mapActions} from "vuex";
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = 'https://nowtime-back.ffox.site/api';
+// axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // axios.defaults.headers.common['Authorization'] = 'Bearer 1|VeZIwdWDAeGQehhQQKPGzTv7fNmTVxzIoCsmKOry';
 axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -28,12 +29,17 @@ export default {
             return axios.update('/project', project);
         },
 
-        get(id) {
+        get(id, parent_task_id = null) {
             return axios.get('/project', {
                 params: {
-                    id: id
+                    id: id,
+                    parent_task_id
                 }
             });
+        },
+
+        getList() {
+            return axios.get('/project/list');
         },
 
         my() {
@@ -42,28 +48,36 @@ export default {
 
         delete(id) {
             return axios.delete('/project', {
-                id: id
+                data: {
+
+                    id: id
+                }
+
             });
         },
 
 
-        inviteUser(project_id, user_id, role) {
-            return axios.post('/managerUser', {
+        inviteUser(project_id, email, role) {
+            return axios.post('/project/managerUser', {
                 project_id,
-                user_id,
+                email,
                 role
             });
         },
 
         removeUser(project_id, user_id) {
-            return axios.delete('/managerUser', {
-                project_id,
-                user_id
+            return axios.delete('/project/managerUser', {
+                data: {
+
+                    project_id,
+                    user_id
+                }
+
             });
         },
 
         updateUser(project_id, user_id, role) {
-            return axios.put('/managerUser', {
+            return axios.put('/project/managerUser', {
                 project_id,
                 user_id,
                 role
@@ -78,7 +92,13 @@ export default {
         },
 
         update(task) {
-            return axios.update('/task', task);
+            return axios.put('/task', task);
+        },
+
+        rename(id, name) {
+            return axios.put('/task/name', {
+                id, name
+            })
         },
 
         get(id) {
@@ -91,7 +111,10 @@ export default {
 
         delete(id) {
             return axios.delete('/task', {
-                id: id
+                data: {
+                    id: id
+                }
+
             });
         },
 
@@ -116,10 +139,10 @@ export default {
             });
         },
 
-        changeStatus(task_id, status_order) {
-            return axios.post('/changeStatus', {
+        changeStatus(task_id, status_id) {
+            return axios.post('/task/changeStatus', {
                 task_id,
-                status_order
+                status_id
             });
         },
 
@@ -138,15 +161,17 @@ export default {
 
     timer: {
         start(task_id, project_id = null) {
-            return axios.post('/timer/start');
+            return axios.post('/timer/start', {
+                task_id, project_id
+            });
         },
 
         stop() {
             return axios.post('/timer/stop');
         },
 
-        updateTiming(timeToAppend, task_id, project_id=null){
-            return axios.post('/updateTiming', {
+        updateTiming(timeToAppend, task_id, project_id = null) {
+            return axios.post('timer/updateTiming', {
                 timeToAppend,
                 task_id,
                 project_id
@@ -160,8 +185,11 @@ export default {
         },
         login(user) {
             return axios.post('/login', user);
-        }
+        },
 
+        me() {
+            return axios.get('/me');
+        }
     }
 }
 
