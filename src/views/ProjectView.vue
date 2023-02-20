@@ -48,6 +48,15 @@ import service from "@/service";
                 </div>
 
                 <div>
+                    <h4>Время</h4>
+                    <select v-model="timing_user" @change="getProject">
+                        <option value="all">Общее</option>
+                        <option v-for="projectUser in project.users" :key="projectUser.id" :value="projectUser.id">
+                            {{ projectUser.name }}
+                        </option>
+                    </select>
+                </div>
+                <div>
                     <h4>Пользователи</h4>
                     <div class="flex ">
                         <div class="card p-2 flex" v-for="projectUser in project.users" :key="projectUser.id">
@@ -247,6 +256,7 @@ export default {
                 timer: false,
                 newUser: false
             },
+            timing_user: null,
             project: {},
             newTask: {},
             newUser: {},
@@ -343,7 +353,7 @@ export default {
                 parent_task_id = this.$route.query.taskId
             }
 
-            api.project.get(this.$route.params.id, parent_task_id).then((response) => {
+            api.project.get(this.$route.params.id, this.timing_user , parent_task_id).then((response) => {
                 console.log(response.data)
                 this.project = response.data
                 this.setTitle(this.project.name)
