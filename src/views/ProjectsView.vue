@@ -34,7 +34,6 @@
                         </div>
                     </div>
                     </div>
-
                 </div>
 
                 <div class="project-item__tasks">
@@ -54,7 +53,11 @@
         </div>
         <modal-component v-model="testModal" title="Новый проект">
             <form @submit.prevent="createProject">
-                <input type="text" v-model="newProject.name">
+                <input-view type="text" placeholder="Название" v-model="newProject.name" inputClass="big"/>
+                <div class="flex justify-content-between">
+                    <span class="fs-075rem">Статусы</span>
+                    <div class="cp" @click.stop="newProject.statuses.push({})">+</div>
+                </div>
                 <draggable
                     :list="newProject.statuses"
                     :disabled="!enabled"
@@ -65,13 +68,14 @@
                 >
                     <template #item="{ element, idx }">
                         <div class="p-2 border border-3 flex" :class="{ 'not-draggable': !enabled }">
-                            {{element.order}}
-                            <input type="text" v-model="element.name">
-                            <div class="btn btn-primary" @click="newProject.statuses.splice(idx, 1)">-</div>
+                            {{ element.order }}
+                            <input class="p-2" type="text" v-model="element.name">
+                            <div class="btn btn-primary pt-2 pb-2" @click="newProject.statuses.splice(idx, 1)">
+                                <svg width="15" height="15" viewBox="0 0 162 161" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M158.7 146.3C160.202 147.817 161.045 149.865 161.045 152C161.045 154.135 160.202 156.183 158.7 157.7C157.171 159.178 155.127 160.005 153 160.005C150.873 160.005 148.829 159.178 147.3 157.7L81.0001 91.2999L14.7001 157.7C13.171 159.178 11.1271 160.005 9.00008 160.005C6.87303 160.005 4.8292 159.178 3.30008 157.7C1.79783 156.183 0.955078 154.135 0.955078 152C0.955078 149.865 1.79783 147.817 3.30008 146.3L69.7001 79.9999L3.30008 13.6999C2.02438 12.1456 1.37244 10.1723 1.47108 8.16385C1.56972 6.15543 2.41189 4.2555 3.83376 2.83362C5.25564 1.41174 7.15557 0.569581 9.16399 0.47094C11.1724 0.3723 13.1457 1.02423 14.7001 2.29994L81.0001 68.6999L147.3 2.29994C148.854 1.02423 150.828 0.3723 152.836 0.47094C154.845 0.569581 156.745 1.41174 158.166 2.83362C159.588 4.2555 160.43 6.15543 160.529 8.16385C160.628 10.1723 159.976 12.1456 158.7 13.6999L92.3001 79.9999L158.7 146.3Z" fill="white"></path></svg>
+                            </div>
                         </div>
                     </template>
                 </draggable>
-                <div @click.stop="newProject.statuses.push({})">+</div>
                 <button class="btn btn-primary">Сохранить</button>
             </form>
 
@@ -87,11 +91,13 @@ import api from "@/api"
 import {mapActions} from "vuex";
 import vuedraggable from "vuedraggable/src/vuedraggable";
 import {useToast} from "vue-toastification";
+import InputView from "../components/InputView.vue";
 
 export default {
     name: 'projects-view',
 
     components: {
+        InputView,
         CheckboxView,
         ModalComponent,
 
@@ -137,6 +143,7 @@ export default {
             api.project.create(this.newProject).then(response => {
                 console.log(response.data)
                 this.projects.push(response.data)
+                this.closeModal()
             }).catch(error => {
                 console.log(error)
             })
@@ -149,8 +156,14 @@ export default {
                 console.log(error)
                 useToast().error('Ошибка удаления')
             })
-        }
+        },
 
+        closeModal() {
+            this.testModal = false
+            this.newProject = {
+                statuses: []
+            }
+        },
     }
 }
 

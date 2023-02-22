@@ -8,7 +8,7 @@ import service from "@/service";
             loading...
         </div>
         <div class="project__content" v-else>
-            <div class="flex justify-between pe-3">
+            <div class="flex justify-between align-items-baseline pe-3">
                 <div class="">
 
                     <div class="project__timer">
@@ -49,7 +49,7 @@ import service from "@/service";
 
                 <div>
                     <h4>Время</h4>
-                    <select v-model="timing_user" @change="getProject">
+                    <select class="form-select" v-model="timing_user" @change="getProject">
                         <option value="all">Общее</option>
                         <option v-for="projectUser in project.users" :key="projectUser.id" :value="projectUser.id">
                             {{ projectUser.name }}
@@ -217,12 +217,12 @@ import service from "@/service";
             <form @submit.prevent="saveNewUser" class="form">
                 <div class="flex">
 
-                    <select v-model="newUser.role">
+                    <select class="form-select pb-1 pt-1" v-model="newUser.role">
                         <option value="observer">observer</option>
                         <option value="worker">worker</option>
                         <option value="admin">admin</option>
                     </select>
-                    <input type="email" v-model="newUser.email">
+                    <input class="p-1 fs-1rem" type="email" v-model="newUser.email">
                 </div>
                 <button class="btn btn-primary">Сохранить</button>
 
@@ -245,9 +245,7 @@ export default {
     },
 
     mounted() {
-
         this.getProject();
-
     },
 
     data: function () {
@@ -375,7 +373,8 @@ export default {
                     }
                 }
 
-
+                if (this.timing_user == null)
+                    this.timing_user = this.project.user_id
             }).catch(error => {
                 console.log(error)
             })
