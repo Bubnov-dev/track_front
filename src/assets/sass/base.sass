@@ -27,13 +27,12 @@ body
     display: flex
     align-items: center
     gap: 10px
+
     &.right
         place-items: end
 
     &.justify-between
         justify-content: space-between
-
-
 
 
 main.center
@@ -46,6 +45,7 @@ main.center
     background: $secondary
     box-shadow: 1px 1px 3px 3px #ddd
     color: $primary
+
     &__header
         // border-bottom: 1px solid $border
         color: $secondary
@@ -56,11 +56,12 @@ main.center
         padding-top: 15px
 
 input
-    background: rgba(0,0,0,0)
+    background: rgba(0, 0, 0, 0)
     border: 2px solid $primary
     padding: 5px 10px
     border-radius: 5px
     outline: none
+
     &.big
         padding: 15px
 
@@ -71,6 +72,7 @@ label.wrapper
     grid-template-columns: 100%
     gap: 15px
     align-items: center
+    position: relative
 
     .placeholder
         grid-column: 1/2
@@ -87,10 +89,22 @@ label.wrapper
         outline: none !important
 
         &:focus, &:not(:placeholder-shown)
-            &+.placeholder
+            & + .placeholder
                 margin-top: -2.8rem
-                background: #eee
+                //background: #eee
+                background: #fff
                 font-size: .7rem
+
+    .input
+        &__append
+            position: absolute
+            right: 10px
+            width: 24px
+            height: 24px
+
+            svg
+                width: 100%
+                height: 100%
 
 button
     cursor: pointer
@@ -103,6 +117,7 @@ button
     position: relative
     text-decoration: none
     height: fit-content
+
     &::after
         content: ''
         position: absolute
@@ -110,6 +125,7 @@ button
         height: 100%
         top: 0
         left: 0
+
     &-primary
         padding: .5rem
         background: $primary
@@ -139,6 +155,7 @@ form
     display: flex
     gap: 12px
     align-items: center
+
     .fake-checkbox
         border-radius: 50%
         width: 16px
@@ -151,8 +168,9 @@ form
 
     input
         display: none
+
         &:checked
-            &+.fake-checkbox
+            & + .fake-checkbox
                 content: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11.0253 0.641394C11.2694 0.885472 11.2694 1.2812 11.0253 1.52528L5.19194 7.35861C4.94786 7.60269 4.55214 7.60269 4.30806 7.35861L0.974725 4.02528C0.730648 3.7812 0.730648 3.38547 0.974725 3.14139C1.2188 2.89732 1.61453 2.89732 1.85861 3.14139L4.75 6.03279L10.1414 0.641394C10.3855 0.397316 10.7812 0.397316 11.0253 0.641394Z' fill='%23FFF1DE'/%3E%3C/svg%3E")
                 background: #83c36B
                 border-color: #83c36B
@@ -169,6 +187,7 @@ form
     transition: .3s
     border: 3px solid #ffffff00
     resize: none
+
     &:focus
         border: 3px solid $primary
         resize: both
@@ -188,8 +207,10 @@ form
 
 .p-3
     padding: 1rem
+
 .p-2
     padding: .5rem
+
 .p-1
     padding: .2rem
 
@@ -198,6 +219,7 @@ form
 
 .tooltip
     position: relative
+
     &-menu
         display: none !important
 
@@ -206,5 +228,20 @@ form
         left: -10px
         top: -50px
         z-index: 100
+
         &.open
             display: initial !important
+
+
+.hint
+    position: absolute
+    top: 85%
+    z-index: 10
+    padding: 10px
+    font-size: 12px
+    line-height: 14px
+    border-radius: 5px
+
+    &--error
+        background-color: transparent
+        color: red

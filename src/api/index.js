@@ -1,8 +1,8 @@
 import axios from "axios"
 import {mapGetters, mapActions} from "vuex";
 
-// axios.defaults.baseURL = 'https://nowtime-back.ffox.site/api';
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = 'https://nowtime-back.ffox.site/api';
+// axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // axios.defaults.headers.common['Authorization'] = 'Bearer 1|VeZIwdWDAeGQehhQQKPGzTv7fNmTVxzIoCsmKOry';
 axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
