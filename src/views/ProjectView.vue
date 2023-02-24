@@ -8,82 +8,72 @@ import service from "@/service";
             loading...
         </div>
         <div class="project__content" v-else>
+            <div class="project__parent-task" v-if="project.parent_task">
+                <div class="project__parent-task-header">
+                    <router-link :to="{name: 'project', params: {id: project.id}}"
+                                 class="project__parent-task-back"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 22L6 12L16 2L17.775 3.775L9.55 12L17.775 20.225L16 22Z" fill="white"/>
+                        </svg>
+                    </router-link>
+                    <h3>Задача: {{ project.parent_task.name }}</h3>
+                </div>
+                <!--                <div class="flex">-->
+                <!--                    <h4>Описание</h4>-->
+                <!--                    <button class="btn btn-primary" @click="focusDesc">Поменять</button>-->
+                <!--                </div>-->
+                <textarea id="desc" class="hidden-textarea project__parent-task-description"
+                          v-model="project.parent_task.description"
+                          @change="updateTaskDescription(project.parent_task)"
+                          placeholder="Опишите задачу"></textarea>
+            </div>
             <div class="flex justify-between align-items-baseline pe-3">
-                <div class="">
-
-                    <div class="project__timer">
-
-                        Итого:
+                <div>
+                    <div class="flex">
+                        <h4>Время</h4>
                         <span>{{ service.formatTime(project.time ?? 0) }}</span>
                     </div>
-
-                    <div class="project__parent-task" v-if="project.parent_task">
-                        <div class="project__parent-task-header">
-                            <router-link :to="{name: 'project', params: {id: project.id}}"
-                                         class="project__parent-task-back"
-                            >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M16 22L6 12L16 2L17.775 3.775L9.55 12L17.775 20.225L16 22Z" fill="white"/>
-                                </svg>
-
-                            </router-link>
-                            <h3>Задача: {{ project.parent_task.name }}</h3>
-                        </div>
-
-                        <!--                <div class="flex">-->
-                        <!--                    <h4>Описание</h4>-->
-                        <!--                    <button class="btn btn-primary" @click="focusDesc">Поменять</button>-->
-                        <!--                </div>-->
-                        <textarea id="desc" class="hidden-textarea project__parent-task-description"
-                                  v-model="project.parent_task.description"
-                                  @change="updateTaskDescription(project.parent_task)"
-                                  placeholder="Опишите задачу"
-                        >
-
-                </textarea>
-
-
+                    <div class="flex align-items-baseline">
+                        <h4 class="mt-0">Чье</h4>
+                        <select class="form-select" v-model="timing_user" @change="getProject">
+                            <option value="all">Общее</option>
+                            <option v-for="projectUser in project.users" :key="projectUser.id" :value="projectUser.id">
+                                {{ projectUser.name }}
+                            </option>
+                        </select>
                     </div>
                 </div>
 
                 <div>
-                    <h4>Время</h4>
-                    <select class="form-select" v-model="timing_user" @change="getProject">
-                        <option value="all">Общее</option>
-                        <option v-for="projectUser in project.users" :key="projectUser.id" :value="projectUser.id">
-                            {{ projectUser.name }}
-                        </option>
-                    </select>
-                </div>
-                <div>
                     <h4>Пользователи</h4>
-                    <div class="flex ">
-                        <div class="card p-2 flex" v-for="projectUser in project.users" :key="projectUser.id">
+                    <div class="flex project__users">
+                        <div class="card p-2 flex" :class="{'cp':projectUser.id != project.user_id}"
+                             v-for="projectUser in project.users" :key="projectUser.id"
+                             @click="if(projectUser.id != project.user_id)
+                              openUpdateUser(projectUser);">
                             {{ projectUser.name }}
                             <button class="btn" v-if="projectUser.id != project.user_id"
-                                    @click="removeUser(projectUser.id)">
+                                    @click.stop="removeUser(projectUser.id)">
                                 <svg width="9" height="9" viewBox="0 0 162 161" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M158.7 146.3C160.202 147.817 161.045 149.865 161.045 152C161.045 154.135 160.202 156.183 158.7 157.7C157.171 159.178 155.127 160.005 153 160.005C150.873 160.005 148.829 159.178 147.3 157.7L81.0001 91.2999L14.7001 157.7C13.171 159.178 11.1271 160.005 9.00008 160.005C6.87303 160.005 4.8292 159.178 3.30008 157.7C1.79783 156.183 0.955078 154.135 0.955078 152C0.955078 149.865 1.79783 147.817 3.30008 146.3L69.7001 79.9999L3.30008 13.6999C2.02438 12.1456 1.37244 10.1723 1.47108 8.16385C1.56972 6.15543 2.41189 4.2555 3.83376 2.83362C5.25564 1.41174 7.15557 0.569581 9.16399 0.47094C11.1724 0.3723 13.1457 1.02423 14.7001 2.29994L81.0001 68.6999L147.3 2.29994C148.854 1.02423 150.828 0.3723 152.836 0.47094C154.845 0.569581 156.745 1.41174 158.166 2.83362C159.588 4.2555 160.43 6.15543 160.529 8.16385C160.628 10.1723 159.976 12.1456 158.7 13.6999L92.3001 79.9999L158.7 146.3Z"
                                         fill="black"/>
                                 </svg>
-
                             </button>
                         </div>
                         <button class="btn btn-primary" @click="openNewUser">+</button>
                     </div>
                 </div>
-
             </div>
-
 
             <div class="project__statuses" :class="{'task' : project.parent_task}">
                 <div class="project__statuses-content">
 
                     <div class="project__status" v-for="status in project.statuses" :key="status.id">
-                        <h3 class="project__status-title">{{ status.name }}</h3>
+
                         <draggable
                             class="project__tasks"
                             :data-status-id="status.id"
@@ -93,11 +83,12 @@ import service from "@/service";
                             item-key="id"
                             @end="endStatus"
                         >
-
-                            <template #item="{ element }">
+                            <template #header>
+                                <h3 class="project__status-title">{{ status.name }}</h3>
+                            </template>
+                            <template #item="{ element }" :key="element.id">
                                 <div class="project__task card">
                                     <div class="tooltip">
-
                                         <button class="project__task-additional tooltip-btn btn">
                                             <svg width="4" height="16" viewBox="0 0 4 16" fill="none"
                                                  xmlns="http://www.w3.org/2000/svg">
@@ -107,7 +98,6 @@ import service from "@/service";
                                             </svg>
                                         </button>
                                         <div class="tooltip-menu">
-
                                             <div class="project__additional-menu card"
                                                  onclick="event.stopPropagation()">
                                                 <div class="project__additional-menu-item">
@@ -120,7 +110,6 @@ import service from "@/service";
                                             </div>
                                         </div>
                                     </div>
-
 
                                     <form v-if="element.edit == true" class="project__task-rename"
                                           @submit.prevent="renameTask(element)">
@@ -159,44 +148,37 @@ import service from "@/service";
                                             </div>
                                         </div>
                                     </template>
+                                </div>
+                            </template>
+                            <template #footer>
+                                <br>
+                                <div class="project__card-new" key="footer">
+                                    <button class="project__card-new-btn btn" @click="showTaskForm">
+                                        <svg width="30" height="25" viewBox="0 0 18 18" fill="none"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M8 14H10V10H14V8H10V4H8V8H4V10H8V14ZM2 18C1.45 18 0.979 17.8043 0.587 17.413C0.195667 17.021 0 16.55 0 16V2C0 1.45 0.195667 0.979 0.587 0.587C0.979 0.195667 1.45 0 2 0H16C16.55 0 17.021 0.195667 17.413 0.587C17.8043 0.979 18 1.45 18 2V16C18 16.55 17.8043 17.021 17.413 17.413C17.021 17.8043 16.55 18 16 18H2ZM2 16H16V2H2V16Z"
+                                                fill="white"/>
+                                        </svg>
 
-
+                                    </button>
+                                    <form class="project__task-form" @submit.prevent="createTask">
+                                        <input type="text" placeholder="Новая задача" v-model="newTask.name">
+                                        <input type="hidden" name="status" :value="status.id">
+                                        <button class="btn">Добавить</button>
+                                    </form>
                                 </div>
                             </template>
                         </draggable>
-                        <div class="project__tasks">
-                            <br>
-                            <div class="project__card-new">
-                                <button class="project__card-new-btn btn" @click="showTaskForm">
-                                    <svg width="30" height="25" viewBox="0 0 18 18" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M8 14H10V10H14V8H10V4H8V8H4V10H8V14ZM2 18C1.45 18 0.979 17.8043 0.587 17.413C0.195667 17.021 0 16.55 0 16V2C0 1.45 0.195667 0.979 0.587 0.587C0.979 0.195667 1.45 0 2 0H16C16.55 0 17.021 0.195667 17.413 0.587C17.8043 0.979 18 1.45 18 2V16C18 16.55 17.8043 17.021 17.413 17.413C17.021 17.8043 16.55 18 16 18H2ZM2 16H16V2H2V16Z"
-                                            fill="white"/>
-                                    </svg>
-
-                                </button>
-                                <form class="project__task-form" @submit.prevent="createTask">
-                                    <input type="text" placeholder="Новая задача" v-model="newTask.name">
-                                    <input type="hidden" name="status" :value="status.id">
-                                    <button class="btn">Добавить</button>
-                                </form>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
-
             </div>
-
         </div>
 
         <modal-component v-model="modals.timer">
             Time:{{
                 project.tasks ? (project.tasks.filter((el) => el.id == currentTimer.task_id)[0] ? service.formatTime(project.tasks.filter((el) => el.id == currentTimer.task_id)[0].time ?? 0) : project.tasks.filter((el) => el.id == currentTimer.task_id)) : '-'
             }}
-
-
             <form @submit.prevent="updateTimer">
                 <div class="flex flex-timer">
                     <div class="btn btn-primary" @click="currentTimer.plus = !currentTimer.plus">
@@ -293,7 +275,17 @@ export default {
                 useToast().error('Ошибка')
             })
         },
-
+        updateUser() {
+            api.project.updateUser(this.project.id, this.newUser.email, this.newUser.role).then(response => {
+                if (response.data) {
+                    this.modals.newUser = false
+                } else {
+                    throw Error;
+                }
+            }).catch(error => {
+                useToast().error('Ошибка')
+            })
+        },
         removeUser(user_id) {
             api.project.removeUser(this.project.id, user_id).then(response => {
                 useToast().success('пользователь удален')
@@ -302,6 +294,10 @@ export default {
                 console.log(error)
                 useToast().error('Не получилось удалить')
             })
+        },
+        openUpdateUser(user) {
+            this.newUser = user
+            this.modals.newUser = true
         },
 
         openTimer(task_id, time) {
@@ -345,13 +341,12 @@ export default {
         },
 
         getProject() {
-
             let parent_task_id = null
             if (this.$route.query.taskId) {
                 parent_task_id = this.$route.query.taskId
             }
 
-            api.project.get(this.$route.params.id, this.timing_user , parent_task_id).then((response) => {
+            api.project.get(this.$route.params.id, this.timing_user, parent_task_id).then((response) => {
                 console.log(response.data)
                 this.project = response.data
                 this.setTitle(this.project.name)
@@ -387,12 +382,13 @@ export default {
                 el.classList.remove('open')
             })
             e.target.parentElement.classList.add('open')
+            e.target.parentElement.querySelector("input").focus()
         },
 
         showEditForm(task) {
             task.edit = true
 
-            document.querySelectorAll('.project__additional-menu').forEach(el => {
+            document.querySelectorAll('.tooltip-menu').forEach(el => {
                 el.classList.remove('open')
             })
         },
@@ -489,7 +485,7 @@ export default {
             }).catch(error => {
                 useToast().error('Ошибка')
             });
-        }
+        },
     },
 
     computed: {

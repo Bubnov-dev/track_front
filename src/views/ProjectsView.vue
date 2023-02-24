@@ -28,7 +28,7 @@
                             <div class="project__additional-menu-item">
                                 <button class="btn" @click="deleteProject(project.id)">Удалить</button>
                             </div>
-                            <div class="project__additional-menu-item" @click="">
+                            <div class="project__additional-menu-item" @click.stop="">
                                 <button class="btn">Отредактировать</button>
                             </div>
                         </div>
