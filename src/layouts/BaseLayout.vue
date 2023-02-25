@@ -4,7 +4,7 @@ import service from "@/service";
 
 <template>
   <div class="base-layout">
-    <div class="base-layout__menu main-menu">
+    <div class="base-layout__menu">
       <div class="main-menu">
         <router-link to="/" class="main-menu__logo">
           <h1>

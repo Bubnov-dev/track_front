@@ -171,4 +171,5 @@ export default {
 
 <style lang="sass">
 @import "@/assets/sass/projects"
+@import "@/assets/sass/preview"
 </style>
