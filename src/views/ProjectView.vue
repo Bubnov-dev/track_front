@@ -4,6 +4,36 @@ import service from "@/service";
 
 <template>
     <div class="project">
+        <div class="preview" :class="{'active': preview}">
+            <div class="preview__content" v-if="previewTask">
+                <div class="preview__header flex align-items-baseline">
+                    <h2>{{ previewTask.parent_task.name }}</h2>
+                    <button class="preview__button" @click="preview = false">
+                        <svg class="Icon CloseIcon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                            <path
+                                d="M2,14.5h18.4l-7.4-7.4c-0.6-0.6-0.6-1.5,0-2.1c0.6-0.6,1.5-0.6,2.1,0l10,10c0.6,0.6,0.6,1.5,0,2.1l-10,10c-0.3,0.3-0.7,0.4-1.1,0.4c-0.4,0-0.8-0.1-1.1-0.4c-0.6-0.6-0.6-1.5,0-2.1l7.4-7.4H2c-0.8,0-1.5-0.7-1.5-1.5C0.5,15.3,1.2,14.5,2,14.5z M28,3.5C28,2.7,28.7,2,29.5,2S31,2.7,31,3.5v25c0,0.8-0.7,1.5-1.5,1.5S28,29.3,28,28.5V3.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <router-link @click.stop="" class="preview__link"
+                             :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.parent_task.id}}">
+                    Перейти на страницу задачи
+                </router-link>
+                <div class="preview__description">
+                    {{ previewTask.parent_task.description }}
+                </div>
+
+                <div class="preview__statuses" v-for="status in previewTask.statuses" :key="status.id">
+                    <div class="preview__status">
+                        <h3 class="project__status-title preview__status-title">{{ status.name }}</h3>
+                        <div class="preview__task" v-for="task in previewTask.tasks.filter(t => t.status_id == status.id)"
+                             :key="task.id">
+                            {{ task.name }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="project__loading" v-if="loading.project">
             loading...
         </div>
@@ -87,7 +117,7 @@ import service from "@/service";
                                 <h3 class="project__status-title">{{ status.name }}</h3>
                             </template>
                             <template #item="{ element }" :key="element.id">
-                                <div class="project__task card" @click.stop="openPreview(element.id)">
+                                <div class="project__task card">
                                     <div class="tooltip">
                                         <button class="project__task-additional tooltip-btn btn">
                                             <svg width="4" height="16" viewBox="0 0 4 16" fill="none"
@@ -117,20 +147,20 @@ import service from "@/service";
                                         <button class="btn btn-primary">сохранить</button>
                                     </form>
                                     <template v-else>
-                                        <div class="project__task-content">
+                                        <div class="project__task-content" @click.stop="openPreview(element.id)">
                                             {{ element.name }}
                                         </div>
                                         <div class="project__additional flex">
                                             <div class="timer" :class="{'active' : element.id == timer.task_id}">
-                                                <router-link @click.stop=""
-                                                             :to="{name: 'project', params: {id: project.id}, query: {taskId: element.id}}"
-                                                             class="timer__btn timer__btn--enter">
-                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24"
-                                                         data-testid="LowPriorityRoundedIcon">
-                                                        <path fill="white"
-                                                              d="M15 5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm0 5.5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm0 5.5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm-5.15 3.15 1.79-1.79c.2-.2.2-.51 0-.71l-1.79-1.79c-.31-.32-.85-.1-.85.35v3.59c0 .44.54.66.85.35zM9 16h-.3c-2.35 0-4.45-1.71-4.68-4.05C3.76 9.27 5.87 7 8.5 7H11c.55 0 1-.45 1-1s-.45-1-1-1H8.5c-3.86 0-6.96 3.4-6.44 7.36C2.48 15.64 5.43 18 8.73 18H9"></path>
-                                                    </svg>
-                                                </router-link>
+<!--                                                <router-link @click.stop=""-->
+<!--                                                             :to="{name: 'project', params: {id: project.id}, query: {taskId: element.id}}"-->
+<!--                                                             class="timer__btn timer__btn&#45;&#45;enter">-->
+<!--                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24"-->
+<!--                                                         data-testid="LowPriorityRoundedIcon">-->
+<!--                                                        <path fill="white"-->
+<!--                                                              d="M15 5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm0 5.5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm0 5.5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm-5.15 3.15 1.79-1.79c.2-.2.2-.51 0-.71l-1.79-1.79c-.31-.32-.85-.1-.85.35v3.59c0 .44.54.66.85.35zM9 16h-.3c-2.35 0-4.45-1.71-4.68-4.05C3.76 9.27 5.87 7 8.5 7H11c.55 0 1-.45 1-1s-.45-1-1-1H8.5c-3.86 0-6.96 3.4-6.44 7.36C2.48 15.64 5.43 18 8.73 18H9"></path>-->
+<!--                                                    </svg>-->
+<!--                                                </router-link>-->
 
                                                 <div class="timer__time" @click="openTimer(element.id, element.time)">
                                                     {{ service.formatTime(element.time ?? 0) }}
@@ -182,11 +212,6 @@ import service from "@/service";
             </div>
         </div>
 
-        <div class="preview" :class="{'active': preview}">
-            <div class="preview__content">
-                {{ previewTask.name }}
-            </div>
-        </div>
 
         <modal-component v-model="modals.timer">
             Time:{{
@@ -267,7 +292,7 @@ export default {
             },
 
             preview: false,
-            previewTask: {},
+            previewTask: null,
         }
     },
 
@@ -507,11 +532,11 @@ export default {
         },
 
         openPreview(id) {
-            this.preview = !this.preview
+            if (!this.preview || this.previewTask.parent_task.id == id)
+                this.preview = !this.preview
             if (this.preview) {
                 let parent_task_id = this.project.id
                 api.project.get(this.$route.params.id, this.timing_user, id).then((response) => {
-                    console.log(response.data)
                     this.previewTask = response.data
                 }).catch(error => {
                     console.log(error)

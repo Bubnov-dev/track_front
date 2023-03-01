@@ -1,5 +1,5 @@
 .preview
-    position: absolute
+    position: fixed
     right: 0
     top: 0
     bottom: 0
@@ -12,9 +12,47 @@
 
     &.active
         width: 350px
+        max-width: 30vw
         box-shadow: 1px 1px 3px 3px #ddd
+
+        & ~ div .project__statuses
+            padding-right: 350px
+
+    & ~ div .project__statuses
+        transition: padding 0.5s
+
+    &__link
+        font-size: 12px
+        line-height: 100%
+        color: $middle
+        text-decoration: underline
+        cursor: pointer
+
+        &:hover
+            text-decoration: none
 
     &__content
         width: 320px
+        max-width: 29vw
         padding: 15px
         overflow-y: auto
+
+    &__button
+        width: 24px
+        height: 24px
+        background: transparent
+
+        svg
+            width: 100%
+
+    &__status
+        margin-bottom: 20px
+        &-title
+            margin: 0
+            padding: 10px
+            border-bottom: 2px solid $primary
+
+    &__task
+        border-bottom: 1px solid $middle
+        padding: 5px
+
