@@ -4,12 +4,12 @@
             <div class="profile__avatar">
                 <img src="src/assets/profile.svg">
             </div>
-            <button class="btn btn-primary m-auto" @click="changePasswordModal=true">
-                Поменять пароль
-            </button>
+            <!--            <button class="btn btn-primary m-auto" @click="changePasswordModal=true">-->
+            <!--                Поменять пароль-->
+            <!--            </button>-->
         </div>
         <div class="profile-right">
-            <form @submit.prevent="">
+            <form @submit.prevent="" class="form">
                 <InputView placeholder="Имя" v-model="user.name" inputClass="big"
                            :error="v$.user.name.$errors.length ? v$.user.name.$errors[0].$message : ''"/>
                 <InputView placeholder="E-mail" v-model="user.email" inputClass="big"
@@ -20,18 +20,30 @@
                     </button>
                 </div>
             </form>
-        </div>
-        <modal-component v-model="changePasswordModal">
             <form @submit.prevent="changePassword" class="form">
                 <InputView placeholder="Пароль" v-model="password.password" inputClass="big" typeProp="password"
                            :error="v$.password.password.$errors.length ? v$.password.password.$errors[0].$message : ''"/>
                 <InputView placeholder="Повторите пароль" v-model="password.password_confirmation" inputClass="big"
                            type="password"
                            :error="v$.password.password_confirmation.$errors.length ? v$.password.password_confirmation.$errors[0].$message : ''"/>
-
-                <button class="btn btn-primary">Сохранить</button>
+                <div class="input flex">
+                    <button class="btn btn-primary ms-auto" @click="saveChanges">
+                        Изменить
+                    </button>
+                </div>
             </form>
-        </modal-component>
+        </div>
+        <!--        <modal-component v-model="changePasswordModal">-->
+        <!--            <form @submit.prevent="changePassword" class="form">-->
+        <!--                <InputView placeholder="Пароль" v-model="password.password" inputClass="big" typeProp="password"-->
+        <!--                           :error="v$.password.password.$errors.length ? v$.password.password.$errors[0].$message : ''"/>-->
+        <!--                <InputView placeholder="Повторите пароль" v-model="password.password_confirmation" inputClass="big"-->
+        <!--                           type="password"-->
+        <!--                           :error="v$.password.password_confirmation.$errors.length ? v$.password.password_confirmation.$errors[0].$message : ''"/>-->
+
+        <!--                <button class="btn btn-primary">Сохранить</button>-->
+        <!--            </form>-->
+        <!--        </modal-component>-->
     </div>
 </template>
 

@@ -1,6 +1,9 @@
 @import "vars"
 
 .profile
+    padding-top: 25px
+    align-items: flex-start
+
     &-left
         @include vertical
         gap: 20px
@@ -10,13 +13,17 @@
     &-right
         width: 100%
 
-        input, .input
+        .wrapper, .input
             max-width: 50vw
             width: 100%
+
+        .form
+            margin-bottom: 20px
 
     &__avatar
         width: 250px
         height: 330px
+        max-height: 330px
         overflow: hidden
         display: grid
         align-items: center

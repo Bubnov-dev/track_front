@@ -80,6 +80,17 @@ import service from "@/service";
                         {{ user.name }}
                     </router-link>
                 </div>
+                <div class="base-layout__header-logout">
+                    <button class="btn" @click="logout">
+                        <svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiBox-root css-1om0hkc" focusable="false"
+                             aria-hidden="true" viewBox="0 0 24 24" data-testid="LogoutRoundedIcon">
+                            <path
+                                d="M5 5h6c.55 0 1-.45 1-1s-.45-1-1-1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h6c.55 0 1-.45 1-1s-.45-1-1-1H5V5z"></path>
+                            <path
+                                d="m20.65 11.65-2.79-2.79c-.32-.32-.86-.1-.86.35V11h-7c-.55 0-1 .45-1 1s.45 1 1 1h7v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.19.2-.51.01-.7z"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
 
@@ -129,7 +140,11 @@ export default {
             api.timer.stop().then((response) => {
                 this.setTimer(response.data)
             });
-        }
+        },
+
+        logout() {
+
+        },
     },
 
 
