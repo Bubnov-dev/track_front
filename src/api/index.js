@@ -1,8 +1,8 @@
 import axios from "axios"
 import {mapGetters, mapActions} from "vuex";
 
-// axios.defaults.baseURL = 'https://nowtime-back.ffox.site/api';
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = 'https://nowtime-back.ffox.site/api';
+// axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // axios.defaults.headers.common['Authorization'] = 'Bearer 1|VeZIwdWDAeGQehhQQKPGzTv7fNmTVxzIoCsmKOry';
 axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -201,18 +201,18 @@ export default {
 
     comments: {
         create(task_id, content) {
-            return axios.post('/comments/', {
+            return axios.post('comments', {
                 task_id, content
             })
         },
         update(id, content) {
 
-            return axios.put('/comments/', {
+            return axios.put('comments', {
                 id, content
             })
         },
         delete(id) {
-            return axios.delete('/comments/', {
+            return axios.delete('comments', {
                 data: {
                     id
                 }
