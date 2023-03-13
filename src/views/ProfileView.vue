@@ -64,6 +64,10 @@ export default {
         InputView,
     },
 
+    mounted() {
+        this.getMe();
+    },
+
     data: function () {
         return {
             show: false,
@@ -98,10 +102,24 @@ export default {
     },
 
     methods: {
-        ...mapActions(['setApiToken']),
+        ...mapActions(['setTimer', 'setTitle']),
+
+        getMe() {
+            api.user.me().then((response) => {
+                console.log(response.data.name)
+                this.user.name = response.data.name
+                this.user.email = response.data.email
+            }).catch(error => {
+                console.log(error)
+            })
+        },
 
         saveChanges() {
-
+            api.user.updateMe(this.user.email, this.user.name).then((response) => {
+                console.log(response)
+            }).catch(error => {
+                console.log(error)
+            })
         },
         changePassword() {
 

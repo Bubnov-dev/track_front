@@ -33,6 +33,27 @@ import service from "@/service";
                         </div>
                     </div>
                 </div>
+
+                <div class="preview__comments">
+                    {{ previewTask.parent_task.comments }}
+                </div>
+                <div class="preview__comment-form">
+                    <form @submit.prevent="">
+                        <div class="flex">
+                            <textarea class="comment" v-model="newComment.text" placeholder="Комментарий"
+                                      rows="3"></textarea>
+                            <button class="preview__button preview__button-comment"
+                                    @click="createComment(previewTask.parent_task.id)">
+                                <svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiBox-root css-1om0hkc"
+                                     focusable="false" aria-hidden="true" viewBox="0 0 24 24"
+                                     data-testid="SendRoundedIcon">
+                                    <path
+                                        d="m3.4 20.4 17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="project__loading" v-if="loading.project">
@@ -224,33 +245,42 @@ import service from "@/service";
                     <!--                        <template v-if="currentTimer.plus">+</template>-->
                     <!--                        <template v-else>-</template>-->
                     <!--                    </div>-->
+
+                    <!--                    <input type="text" v-model="currentTimer.hours">-->
+                    <!--                    <span class="timer-divider">:</span>-->
+                    <!--                    <input type="text" v-model="currentTimer.minutes">-->
+                    <!--                    <span class="timer-divider">:</span>-->
+                    <!--                    <input type="text" v-model="currentTimer.seconds">-->
+                    <input type="time" v-model="currentTimer.start">
+                    <span class="timer-divider">-</span>
+                    <input type="time" v-model="currentTimer.end">
+                    <input pattern="\d{2,2}:\d{2,2}"
+                           v-model="currentTimer.time">
+
+                </div>
+                <div class="flex">
                     <div class="btn btn-primary"
                          @click="currentTimer.plus = true; updateTimer()">
-                        +
+                        Добавить
                     </div>
-                    <input type="text" v-model="currentTimer.hours">
-                    <span class="timer-divider">:</span>
-                    <input type="text" v-model="currentTimer.minutes">
-                    <span class="timer-divider">:</span>
-                    <input type="text" v-model="currentTimer.seconds">
                     <div class="btn btn-primary"
                          @click="currentTimer.plus = false; updateTimer()">
-                        -
+                        Убавить
                     </div>
                 </div>
 
                 <!--                <button class="btn btn-primary">Сохранить</button>-->
 
             </form>
-
-            <form @submit.prevent="">
-                <div class="flex">
-                    <input type="time" v-model="currentTimer.start">
-                    <span class="timer-divider">-</span>
-                    <input type="time" v-model="currentTimer.end">
-                </div>
-                <button class="btn btn-primary">Сохранить</button>
-            </form>
+            <!--             //todo функция корректировки времени-->
+            <!--            <form @submit.prevent="">-->
+            <!--                <div class="flex">-->
+            <!--                    <input type="time" v-model="currentTimer.start">-->
+            <!--                    <span class="timer-divider">-</span>-->
+            <!--                    <input type="time" v-model="currentTimer.end">-->
+            <!--                </div>-->
+            <!--                <button class="btn btn-primary">Сохранить</button>-->
+            <!--            </form>-->
         </modal-component>
 
         <modal-component v-model="modals.newUser">
@@ -298,6 +328,7 @@ export default {
             project: {},
             newTask: {},
             newUser: {},
+            newComment: {},
             loading: {
                 project: true
             },
@@ -563,6 +594,16 @@ export default {
                 })
             }
         },
+
+        createComment(task_id = undefined) {
+            console.log(task_id ?? this.project.id)
+            api.comments.create(task_id ?? this.project.id, this.newComment.text).then((response) => {
+                this.getComments()
+                console.log(response)
+            }).catch((errors) => {
+                console.log(errors)
+            })
+        }
     },
 
     computed: {

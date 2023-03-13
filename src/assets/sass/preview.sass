@@ -27,6 +27,7 @@
         color: $middle
         text-decoration: underline
         cursor: pointer
+        margin: 20px 0
 
         &:hover
             text-decoration: none
@@ -45,8 +46,13 @@
         svg
             width: 100%
 
+        &-comment
+            width: 30px
+            height: 30px
+
     &__status
         margin-bottom: 20px
+
         &-title
             margin: 0
             padding: 10px
@@ -56,3 +62,13 @@
         border-bottom: 1px solid $middle
         padding: 5px
 
+    &__comment
+        &-form
+            position: absolute
+            bottom: 0
+            left: 0
+            right: 0
+            padding: 15px
+
+            .comment
+                width: 100%
