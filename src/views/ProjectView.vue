@@ -35,12 +35,44 @@ import service from "@/service";
                 </div>
 
                 <div class="preview__comments">
-                    {{ previewTask.parent_task.comments }}
+                    <h3>Комментарии</h3>
+                    <div class="preview__comment" v-for="com in previewTask.parent_task.comments" :key="com.id">
+                        <div class="comment__header">
+
+                            <div class="comment__author">
+                                {{ com.id }}
+                            </div>
+                            <div class="comment__date">
+                                {{ new Date(com.created_at).toLocaleDateString('Ru-ru') }}
+                                {{ new Date(com.created_at).toLocaleTimeString('Ru-ru') }}
+                            </div>
+                            <button class="project__task-additional tooltip-btn btn">
+                                <svg width="4" height="16" viewBox="0 0 4 16" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M2 12C2.53043 12 3.03914 12.2107 3.41421 12.5858C3.78929 12.9609 4 13.4696 4 14C4 14.5304 3.78929 15.0391 3.41421 15.4142C3.03914 15.7893 2.53043 16 2 16C1.46957 16 0.96086 15.7893 0.585787 15.4142C0.210714 15.0391 0 14.5304 0 14C0 13.4696 0.210714 12.9609 0.585787 12.5858C0.96086 12.2107 1.46957 12 2 12ZM2 6C2.53043 6 3.03914 6.21071 3.41421 6.58579C3.78929 6.96086 4 7.46957 4 8C4 8.53043 3.78929 9.03914 3.41421 9.41421C3.03914 9.78929 2.53043 10 2 10C1.46957 10 0.96086 9.78929 0.585787 9.41421C0.210714 9.03914 0 8.53043 0 8C0 7.46957 0.210714 6.96086 0.585787 6.58579C0.96086 6.21071 1.46957 6 2 6ZM2 0C2.53043 0 3.03914 0.210714 3.41421 0.585786C3.78929 0.960859 4 1.46957 4 2C4 2.53043 3.78929 3.03914 3.41421 3.41421C3.03914 3.78929 2.53043 4 2 4C1.46957 4 0.96086 3.78929 0.585787 3.41421C0.210714 3.03914 0 2.53043 0 2C0 1.46957 0.210714 0.960859 0.585787 0.585786C0.96086 0.210714 1.46957 0 2 0Z"
+                                        fill="black"/>
+                                </svg>
+                            </button>
+                            <div class="tooltip-menu">
+
+                                <div class="project__additional-menu card" onclick="event.stopPropagation()">
+                                    <div class="project__additional-menu-item">
+                                        <button class="btn" @click="deleteComment(com.id)">Удалить</button>
+                                    </div>
+                                    <div class="project__additional-menu-item">
+                                        <button class="btn" @click="newComment=com">Редактировать</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comment__content">{{ com.content }}</div>
+                    </div>
                 </div>
                 <div class="preview__comment-form">
                     <form @submit.prevent="">
                         <div class="flex">
-                            <textarea class="comment" v-model="newComment.text" placeholder="Комментарий"
+                            <textarea class="comment" v-model="newComment.content" placeholder="Комментарий"
                                       rows="3"></textarea>
                             <button class="preview__button preview__button-comment"
                                     @click="createComment(previewTask.parent_task.id)">
@@ -240,7 +272,7 @@ import service from "@/service";
                 project.tasks ? (project.tasks.filter((el) => el.id == currentTimer.task_id)[0] ? service.formatTime(project.tasks.filter((el) => el.id == currentTimer.task_id)[0].time ?? 0) : project.tasks.filter((el) => el.id == currentTimer.task_id)) : '-'
             }}
             <form @submit.prevent="">
-                <div class="flex flex-timer">
+                <div class=" flex-timer">
                     <!--                    <div class="btn btn-primary" @click="currentTimer.plus = !currentTimer.plus">-->
                     <!--                        <template v-if="currentTimer.plus">+</template>-->
                     <!--                        <template v-else>-</template>-->
@@ -251,11 +283,14 @@ import service from "@/service";
                     <!--                    <input type="text" v-model="currentTimer.minutes">-->
                     <!--                    <span class="timer-divider">:</span>-->
                     <!--                    <input type="text" v-model="currentTimer.seconds">-->
+                    <label>Начало</label>
+                    <label></label>
+                    <label>Конец</label>
+                    <label>Всего</label>
                     <input type="time" v-model="currentTimer.start">
                     <span class="timer-divider">-</span>
                     <input type="time" v-model="currentTimer.end">
-                    <input pattern="\d{2,2}:\d{2,2}"
-                           v-model="currentTimer.time">
+                    <input type="time" v-model="currentTimer.time">
 
                 </div>
                 <div class="flex">
@@ -340,6 +375,9 @@ export default {
                 hours: 0,
                 minutes: 0,
                 seconds: 0,
+                time: 0,
+                start: '',
+                end: '',
             },
 
             preview: false,
@@ -400,7 +438,7 @@ export default {
         },
 
         updateTimer() {
-            let time = Number.parseInt(this.currentTimer.seconds) + Number.parseInt(60 * this.currentTimer.minutes) + Number.parseInt(3600 * this.currentTimer.hours);
+            let time = Number.parseInt(this.currentTimer.time.substr(6, 2)) + Number.parseInt(60 * this.currentTimer.time.substr(3, 2)) + Number.parseInt(3600 * this.currentTimer.time.substr(0, 2));
             if (!this.currentTimer.plus) {
                 time = '-' + time
             }
@@ -587,19 +625,40 @@ export default {
                 this.preview = !this.preview
             if (this.preview) {
                 let parent_task_id = this.project.id
-                api.project.get(this.$route.params.id, this.timing_user, id).then((response) => {
-                    this.previewTask = response.data
-                }).catch(error => {
-                    console.log(error)
+                this.loadPreview(id)
+            }
+        },
+        loadPreview(id) {
+            api.project.get(this.$route.params.id, this.timing_user, id).then((response) => {
+                this.previewTask = response.data
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+
+        createComment(task_id) {
+            if (this.newComment.id) {
+                this.updateComment()
+            } else {
+                api.comments.create(task_id, this.newComment.content).then((response) => {
+                    this.loadPreview(task_id)
+                    this.newComment.content = ''
+                }).catch((errors) => {
+                    console.log(errors)
                 })
             }
         },
-
-        createComment(task_id = undefined) {
-            console.log(task_id ?? this.project.id)
-            api.comments.create(task_id ?? this.project.id, this.newComment.text).then((response) => {
-                this.getComments()
-                console.log(response)
+        updateComment() {
+            api.comments.update(this.newComment.id, this.newComment.content).then((response) => {
+                this.loadPreview(this.previewTask.parent_task.id)
+                this.newComment = {text: ''}
+            }).catch((errors) => {
+                console.log(errors)
+            })
+        },
+        deleteComment(id) {
+            api.comments.delete(id).then((response) => {
+                this.loadPreview(this.previewTask.parent_task.id)
             }).catch((errors) => {
                 console.log(errors)
             })
@@ -639,7 +698,18 @@ export default {
 
             },
             deep: true
+        },
+        currentTimer: {
+            handler() {
+                if (this.currentTimer.start && this.currentTimer.end) {
+                    let end = Number.parseInt(this.currentTimer.end.substr(0, 2)) * 3600 + 60 * Number.parseInt(this.currentTimer.end.substr(3, 2))
+                    let start = Number.parseInt(this.currentTimer.start.substr(0, 2)) * 3600 + 60 * Number.parseInt(this.currentTimer.start.substr(3, 2))
+                    this.currentTimer.time = new Date((end - start) * 1000).toISOString().substr(11, 8)
+                }
+            },
+            deep: true,
         }
+
     }
 }
 </script>

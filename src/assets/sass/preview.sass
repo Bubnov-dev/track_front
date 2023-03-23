@@ -63,6 +63,38 @@
         padding: 5px
 
     &__comment
+        margin-bottom: 15px
+        border-bottom: 1px solid $middle
+
+        & .comment
+            &__header
+                display: flex
+                align-items: baseline
+                gap: 20px
+                position: relative
+
+                .tooltip-btn
+                    height: 15px
+                    padding: 2px
+                    margin-left: auto
+
+                    svg
+                        height: 100%
+
+                .tooltip-menu
+                    right: 10px
+                    left: unset
+
+            &__author
+                font-weight: bold
+
+            &__date
+                font-size: 0.7rem
+                opacity: $middle
+
+            &__content
+                padding: 5px
+
         &-form
             position: absolute
             bottom: 0
