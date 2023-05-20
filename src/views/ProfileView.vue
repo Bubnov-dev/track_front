@@ -2,7 +2,7 @@
     <div class="profile flex">
         <div class="profile-left">
             <div class="profile__avatar">
-                <img src="src/assets/profile.svg">
+                <img src="@/assets/profile.svg">
             </div>
             <!--            <button class="btn btn-primary m-auto" @click="changePasswordModal=true">-->
             <!--                Поменять пароль-->
