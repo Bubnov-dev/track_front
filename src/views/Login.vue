@@ -18,7 +18,7 @@
           <InputView placeholder="Пароль" v-model="user.password" inputClass="big" typeProp="password"
                      :error="v$.user.password.$errors.length ? v$.user.password.$errors[0].$message : ''"/>
           <button class="btn btn-primary" @click="login">
-            Вход
+            Вход <spinner-component :show="loading.auth"/>
           </button>
         </form>
 
@@ -49,11 +49,13 @@ import api from "../api"
 
 import useValidate from '@vuelidate/core'
 import {required, email, minLength, requiredIf, sameAs} from '@vuelidate/validators'
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
 export default {
   name: 'login-page',
 
   components: {
+    SpinnerComponent,
     InputView,
   },
 
@@ -75,6 +77,10 @@ export default {
         password: '',
         password_confirmation: '',
       },
+
+      loading: {
+        auth: false
+      }
     }
   },
   validations() {
@@ -97,12 +103,16 @@ export default {
     login() {
       this.v$.user.$validate() // checks all inputs
       if (!this.v$.user.$errors.length) {
+        this.loading.auth = true
+
         api.user.login(this.user).then((msg) => {
           console.log(msg)
           this.setApiToken(msg.data.token)
           this.$router.push({name: 'projects'})
         }).catch(function (msg) {
           console.log(msg)
+        }).finally(()=>{
+          this.loading.auth = false
         })
       } else {
         //fail validation

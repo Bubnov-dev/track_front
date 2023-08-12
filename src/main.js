@@ -5,6 +5,7 @@ import store from './store'
 import Toast from "vue-toastification";
 import ModalComponent from "@/components/ModalComponent.vue";
 import { useToast } from "vue-toastification";
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
 const options = {
     timeout: 5000
@@ -17,5 +18,6 @@ app.use(store)
 app.use(useToast)
 app.use(Toast, options);
 app.component('modal-component', ModalComponent)
+app.component('spinner-component', SpinnerComponent)
 
 app.mount('#app')
