@@ -34,7 +34,7 @@
                      :error="v$.reg_user.password_confirmation.$errors.length ? v$.reg_user.password_confirmation.$errors[0].$message : ''"/>
 
           <button class="btn btn-primary" @click="register">
-            Регистрация
+            Регистрация  <spinner-component :show="loading.auth"/>
           </button>
         </form>
       </div>
@@ -50,6 +50,7 @@ import api from "../api"
 import useValidate from '@vuelidate/core'
 import {required, email, minLength, requiredIf, sameAs} from '@vuelidate/validators'
 import SpinnerComponent from "@/components/SpinnerComponent.vue";
+import {useToast} from "vue-toastification";
 
 export default {
   name: 'login-page',
@@ -110,6 +111,12 @@ export default {
           this.setApiToken(msg.data.token)
           this.$router.push({name: 'projects'})
         }).catch(function (msg) {
+
+          if (msg.response.status == 403){
+            useToast().error('Неправильный логин или пароль')
+          } else{
+            useToast().error('Произошла непредвиденная ошибка')
+          }
           console.log(msg)
         }).finally(()=>{
           this.loading.auth = false
@@ -123,11 +130,16 @@ export default {
     register() {
       this.v$.reg_user.$validate() // checks all inputs
       if (!this.v$.reg_user.$errors.length) {
-        api.user.register(this.reg_user).then(function (msg) {
+        this.loading.auth = true
+
+        api.user.register(this.reg_user).then( (msg) => {
           console.log(msg)
           this.$router.push({name: 'projects'})
-        }).catch(function (msg) {
+        }).catch( (msg) => {
+          useToast().error('Произошла непредвиденная ошибка')
           console.log(msg)
+        }).finally(()=>{
+          this.loading.auth = false
         })
       }
     }
