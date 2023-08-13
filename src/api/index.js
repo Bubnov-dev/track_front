@@ -110,6 +110,22 @@ export default {
             });
         },
 
+        getTimings(id, timing_user = null){
+            return axios.get('/task/timing', {
+                params: {
+                    id, timing_user
+                }
+            })
+        },
+
+        deleteTiming(id){
+          return axios.delete('/task/timing', {
+              data:{
+                  id
+              }
+          })
+        },
+
         delete(id) {
             return axios.delete('/task', {
                 data: {
