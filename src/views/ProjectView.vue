@@ -7,7 +7,7 @@ import service from "@/service";
         <div class="preview" :class="{'active': preview}">
             <div class="preview__content" v-if="previewTask">
                 <div class="preview__header flex align-items-baseline">
-                    <h2>{{ previewTask.parent_task.name }}</h2>
+                    <h2>{{ previewTask.current_task.name }}</h2>
                     <button class="preview__button" @click="preview = false">
                         <svg class="Icon CloseIcon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                             <path
@@ -16,11 +16,11 @@ import service from "@/service";
                     </button>
                 </div>
                 <router-link @click.stop="" class="preview__link"
-                             :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.parent_task.id}}">
+                             :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.current_task.id}}">
                     Перейти на страницу задачи
                 </router-link>
                 <div class="preview__description">
-                    {{ previewTask.parent_task.description }}
+                    {{ previewTask.current_task.description }}
                 </div>
 
                 <div class="preview__statuses" v-for="status in previewTask.statuses" :key="status.id">
@@ -36,7 +36,7 @@ import service from "@/service";
 
                 <div class="preview__comments">
                     <h3>Комментарии</h3>
-                    <div class="preview__comment" v-for="com in previewTask.parent_task.comments" :key="com.id">
+                    <div class="preview__comment" v-for="com in previewTask.current_task.comments" :key="com.id">
                         <div class="comment__header">
 
                             <div class="comment__author">
@@ -75,7 +75,7 @@ import service from "@/service";
                             <textarea class="comment" v-model="newComment.content" placeholder="Комментарий"
                                       rows="3"></textarea>
                             <button class="preview__button preview__button-comment"
-                                    @click="createComment(previewTask.parent_task.id)">
+                                    @click="createComment(previewTask.current_task.id)">
                                 <svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiBox-root css-1om0hkc"
                                      focusable="false" aria-hidden="true" viewBox="0 0 24 24"
                                      data-testid="SendRoundedIcon">
@@ -92,7 +92,7 @@ import service from "@/service";
             loading...
         </div>
         <div class="project__content" v-else>
-            <div class="project__parent-task" v-if="project.parent_task">
+            <div class="project__parent-task" v-if="project.current_task">
                 <div class="project__parent-task-header">
                     <router-link :to="{name: 'project', params: {id: project.id}}"
                                  class="project__parent-task-back"
@@ -102,15 +102,15 @@ import service from "@/service";
                             <path d="M16 22L6 12L16 2L17.775 3.775L9.55 12L17.775 20.225L16 22Z" fill="white"/>
                         </svg>
                     </router-link>
-                    <h3>Задача: {{ project.parent_task.name }}</h3>
+                    <h3>Задача: {{ project.current_task.name }}</h3>
                 </div>
                 <!--                <div class="flex">-->
                 <!--                    <h4>Описание</h4>-->
                 <!--                    <button class="btn btn-primary" @click="focusDesc">Поменять</button>-->
                 <!--                </div>-->
                 <textarea id="desc" class="hidden-textarea project__parent-task-description"
-                          v-model="project.parent_task.description"
-                          @change="updateTaskDescription(project.parent_task)"
+                          v-model="project.current_task.description"
+                          @change="updateTaskDescription(project.current_task)"
                           placeholder="Опишите задачу"></textarea>
             </div>
             <div class="flex justify-between align-items-baseline pe-3">
@@ -153,7 +153,7 @@ import service from "@/service";
                 </div>
             </div>
 
-            <div class="project__statuses" :class="{'task' : project.parent_task}">
+            <div class="project__statuses" :class="{'task' : project.current_task}">
                 <div class="project__statuses-content">
 
                     <div class="project__status" v-for="status in project.statuses" :key="status.id">
@@ -532,9 +532,9 @@ export default {
         },
         getTask(id) {
             api.task.get(id).then(response => {
-                this.project.parent_task = response.data.task
+                this.project.current_task = response.data.task
                 this.project.tasks = response.data.tasks
-                this.setTitle(this.title + ' - ' + this.project.parent_task.name)
+                this.setTitle(this.title + ' - ' + this.project.current_task.name)
                 document.location.hash
             }).catch(error => {
                 console.log(error)
@@ -546,8 +546,8 @@ export default {
             if (!this.newTask.name) {
                 return
             }
-            if (this.project.parent_task) {
-                this.newTask.task_id = this.project.parent_task.id
+            if (this.project.current_task) {
+                this.newTask.task_id = this.project.current_task.id
             }
             this.newTask.status_id = e.target.elements['status']._value
             this.newTask.project_id = this.project.id
@@ -621,7 +621,7 @@ export default {
         },
 
         openPreview(id) {
-            if (!this.preview || this.previewTask.parent_task.id == id)
+            if (!this.preview || this.previewTask.current_task.id == id)
                 this.preview = !this.preview
             if (this.preview) {
                 let parent_task_id = this.project.id
@@ -650,7 +650,7 @@ export default {
         },
         updateComment() {
             api.comments.update(this.newComment.id, this.newComment.content).then((response) => {
-                this.loadPreview(this.previewTask.parent_task.id)
+                this.loadPreview(this.previewTask.current_task.id)
                 this.newComment = {text: ''}
             }).catch((errors) => {
                 console.log(errors)
@@ -658,7 +658,7 @@ export default {
         },
         deleteComment(id) {
             api.comments.delete(id).then((response) => {
-                this.loadPreview(this.previewTask.parent_task.id)
+                this.loadPreview(this.previewTask.current_task.id)
             }).catch((errors) => {
                 console.log(errors)
             })
