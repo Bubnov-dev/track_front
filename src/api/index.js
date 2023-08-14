@@ -2,7 +2,7 @@ import axios from "axios"
 import {mapGetters, mapActions} from "vuex";
 
 axios.defaults.baseURL = 'https://nowtime-back.ffox.site/api';
-// axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // axios.defaults.headers.common['Authorization'] = 'Bearer 1|VeZIwdWDAeGQehhQQKPGzTv7fNmTVxzIoCsmKOry';
 axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -187,11 +187,9 @@ export default {
             return axios.post('/timer/stop');
         },
 
-        updateTiming(timeToAppend, task_id, project_id = null) {
-            return axios.post('timer/updateTiming', {
-                timeToAppend,
-                task_id,
-                project_id
+        updateTiming(id, start, end) {
+            return axios.put('timer/timing', {
+                id,start,end
             })
         }
     },

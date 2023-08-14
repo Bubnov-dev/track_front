@@ -54,7 +54,7 @@ import service from "@/service";
 
                 <h2>{{ title }}</h2>
                 <div>
-                    timer: {{ timer.start ? service.formatTime((timer.now - timer.start) ?? 0) : '--' }}
+                    timer: {{ timer.start ? service.formatTime(timer.actualSec ?? 0) : '--' }}
                     <button v-if="timer.start" class="btn btn-primary" @click="stopTimer">Остановить</button>
                 </div>
                 <div class="base-layout__header-profile ">

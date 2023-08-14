@@ -6,8 +6,8 @@ export default {
       return ctx.commit('setTimer', timer)
     },
 
-    setNow(ctx, now){
-      return ctx.commit('setTime', now)
+    setTime(ctx, time){
+      return ctx.commit('setTime', time)
     },
 
     setTitle(ctx, title){
@@ -17,10 +17,18 @@ export default {
   mutations: {
     setTimer(state, timer) {
       state.timer = timer
+      if (timer.start) {
+
+        state.interval = setInterval(() => {
+          ++state.timer.actualSec
+        }, 1000)
+      }
     },
 
-    setTime(state, now){
-      state.timer.now = now
+    setTime(state, actualSec){
+      // now = new Date(now)
+
+      state.timer.actualSec = actualSec
     },
 
     setTitle(state, title){
@@ -33,7 +41,8 @@ export default {
   },
   state: {
     timer: {},
-    title: ''
+    title: '',
+    interval: null,
   },
   getters: {
     getTimer(state) {

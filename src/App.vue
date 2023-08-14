@@ -24,7 +24,7 @@ import {useToast} from "vue-toastification";
 export default {
 
     methods: {
-        ...mapActions(['setApiToken', 'setTimer', 'setNow', 'setUser'])
+        ...mapActions(['setApiToken', 'setTimer', 'setTime', 'setUser'])
     },
 
     mounted() {
@@ -48,13 +48,11 @@ export default {
             this.setApiToken(localStorage.getItem('token'))
             api.getTimer().then(response => {
                 this.setTimer(response.data)
+
+
             }).catch(() => {
                 useToast().error('Ошибка')
             });
-
-            setInterval(() => {
-                this.setNow(++this.timer.now)
-            }, 1000)
 
             api.user.me().then(response => {
                 this.setUser(response.data.name)

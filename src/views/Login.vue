@@ -134,6 +134,8 @@ export default {
 
         api.user.register(this.reg_user).then( (msg) => {
           console.log(msg)
+            this.setApiToken(msg.data.token)
+
           this.$router.push({name: 'projects'})
         }).catch( (msg) => {
           useToast().error('Произошла непредвиденная ошибка')

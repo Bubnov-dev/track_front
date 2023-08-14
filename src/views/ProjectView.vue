@@ -271,69 +271,52 @@ import service from "@/service";
             Time:{{
                 project.tasks ? (project.tasks.filter((el) => el.id == currentTimer.task_id)[0] ? service.formatTime(project.tasks.filter((el) => el.id == currentTimer.task_id)[0].time ?? 0) : project.tasks.filter((el) => el.id == currentTimer.task_id)) : '-'
             }}
-            <form @submit.prevent="">
-                <div class=" flex-timer">
-                    <!--                    <div class="btn btn-primary" @click="currentTimer.plus = !currentTimer.plus">-->
-                    <!--                        <template v-if="currentTimer.plus">+</template>-->
-                    <!--                        <template v-else>-</template>-->
-                    <!--                    </div>-->
 
-                    <!--                    <input type="text" v-model="currentTimer.hours">-->
-                    <!--                    <span class="timer-divider">:</span>-->
-                    <!--                    <input type="text" v-model="currentTimer.minutes">-->
-                    <!--                    <span class="timer-divider">:</span>-->
-                    <!--                    <input type="text" v-model="currentTimer.seconds">-->
-                    <label>Начало</label>
-                    <label></label>
-                    <label>Конец</label>
-                    <label>Всего</label>
-                    <input type="time" v-model="currentTimer.start">
-                    <span class="timer-divider">-</span>
-                    <input type="time" v-model="currentTimer.end">
-                    <input type="time" v-model="currentTimer.time">
+            <div>
+                <h3>List of timings</h3>
+                <ul class="timing-list">
+                    <li v-for="timing in formattedTimings" :key="timing.id" class="timing-item">
+                        <div class="timing-list__task">{{ timing.task_name }}</div>
 
-                </div>
-                <div class="flex">
-                    <div class="btn btn-primary"
-                         @click="currentTimer.plus = true; updateTimer()">
-                        Добавить
-                    </div>
-                    <div class="btn btn-primary"
-                         @click="currentTimer.plus = false; updateTimer()">
-                        Убавить
-                    </div>
-                </div>
+                        <div class="datetime-wrapper">
+                            <input
+                                type="date"
+                                v-model="timing.startDate"
+                                @change="updateTiming(timing)"
+                            >
+                            <input
+                                type="time"
+                                v-model="timing.startTime"
+                                @change="updateTiming(timing)"
+                            >
+                        </div>
 
-                <!--                <button class="btn btn-primary">Сохранить</button>-->
+                        -
+                        <div class="datetime-wrapper">
 
-            </form>
-            <!--             //todo функция корректировки времени-->
-            <!--            <form @submit.prevent="">-->
-            <!--                <div class="flex">-->
-            <!--                    <input type="time" v-model="currentTimer.start">-->
-            <!--                    <span class="timer-divider">-</span>-->
-            <!--                    <input type="time" v-model="currentTimer.end">-->
-            <!--                </div>-->
-            <!--                <button class="btn btn-primary">Сохранить</button>-->
-            <!--            </form>-->
+                        <input
+                            type="date"
+                            v-model="timing.endDate"
+                            @change="updateTiming(timing)"
+                        >
+                        <input
+                            type="time"
+                            v-model="timing.endTime"
+                            @change="updateTiming(timing)"
+                        >
+                        </div>
 
-          <div>
-            <h3>List of timings</h3>
-              <ul>
-                  <li v-for="timing in timings" :key="timing.id">
-                      Task: {{ timing.task_name }}
-                      - Time: {{ formatTime(timing.time) }}
+                        ({{ service.formatTime(timing.time) }})
 
-                      <button class="btn" @click="deleteTiming(timing.id)">
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M3 6H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                              <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19ZM10 11V17M14 11V17" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-
-                      </button>
-                  </li>
-              </ul>
-          </div>
+                        <button class="btn-delete" @click="deleteTiming(timing.id)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19ZM10 11V17M14 11V17" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </modal-component>
 
         <modal-component v-model="modals.newUser">
@@ -406,10 +389,23 @@ export default {
 
     methods: {
         ...mapActions(['setTimer', 'setTitle']),
-        deleteTiming(id){
-            api.task.deleteTiming(id).then(response => {
-                this.timings = this.timings.filter(el => el.id!=id)
+        updateTiming(timing) {
+            timing.start = `${timing.startDate} ${timing.startTime}`;
+            timing.end = `${timing.endDate} ${timing.endTime}`;
+            api.timer.updateTiming(timing.id, timing.start, timing.end).then(response => {
+                useToast().success('Обновлено')
+                let ti = this.timings.findIndex(el=>el.id === timing.id)
+                // console.log(ti)
+                // console.log(this.timings[ti])
+                this.timings[ti] = response.data
             }).catch(()=>{
+                useToast().error('Ошибка')
+            })
+        },
+        deleteTiming(id) {
+            api.task.deleteTiming(id).then(response => {
+                this.timings = this.timings.filter(el => el.id != id)
+            }).catch(() => {
                 useToast().error('Ошибка удаления')
             })
         },
@@ -467,7 +463,7 @@ export default {
             console.log(task_id)
             this.currentTimer.task_id = task_id
             this.currentTimer.time = time
-            api.task.getTimings(task_id, this.timing_user).then((response)=>{
+            api.task.getTimings(task_id, this.timing_user).then((response) => {
                 this.timings = response.data
             }).catch(() => {
                 useToast().error("Ошибка получения истории таймера")
@@ -526,12 +522,12 @@ export default {
                             if (this.project.tasks) {
                                 let task = this.project.tasks.find(el => el.id == this.timer.task_id);
                                 if (task) {
-                                    task.time += (this.timer.now - this.timer.start)
+                                    task.time = parseInt(task.time) + (this.timer.actualSec)
                                 }
                             }
                         }
 
-                        this.project.time += (this.timer.now - this.timer.start);
+                        this.project.time += (this.timer.actualSec);
                     }
                 }
 
@@ -637,16 +633,6 @@ export default {
             });
         },
 
-
-        startTimerProject(project_id) {
-            api.timer.start(null, project_id).then(response => {
-                this.setTimer(response.data)
-                useToast().success('засечено')
-            }).catch(error => {
-                useToast().error('Ошибка')
-            });
-        },
-
         stopTimer() {
             api.timer.stop().then(response => {
                 useToast().success('остановлено')
@@ -706,7 +692,23 @@ export default {
         ...mapGetters({
             timer: 'getTimer',
             title: 'getTitle'
-        })
+        }),
+        formattedTimings() {
+            return this.timings.map(timing => {
+                const startDate = timing.start.split(' ')[0];
+                const startTime = timing.start.split(' ')[1].slice(0, 5);
+                const endDate = timing.end.split(' ')[0];
+                const endTime = timing.end.split(' ')[1].slice(0, 5);
+
+                return {
+                    ...timing,
+                    startDate,
+                    startTime,
+                    endDate,
+                    endTime
+                };
+            });
+        }
     },
 
     watch: {
