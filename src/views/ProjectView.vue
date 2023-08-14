@@ -695,18 +695,34 @@ export default {
         }),
         formattedTimings() {
             return this.timings.map(timing => {
-                const startDate = timing.start.split(' ')[0];
-                const startTime = timing.start.split(' ')[1].slice(0, 5);
-                const endDate = timing.end.split(' ')[0];
-                const endTime = timing.end.split(' ')[1].slice(0, 5);
+                if  (timing.start && timing.end) {
+                    const startDate = timing.start.split(' ')[0];
+                    const startTime = timing.start.split(' ')[1].slice(0, 5);
+                    const endDate = timing.end.split(' ')[0];
+                    const endTime = timing.end.split(' ')[1].slice(0, 5);
 
-                return {
-                    ...timing,
-                    startDate,
-                    startTime,
-                    endDate,
-                    endTime
-                };
+                    return {
+                        ...timing,
+                        startDate,
+                        startTime,
+                        endDate,
+                        endTime
+                    };
+                }
+                else{
+                    const startDate =''
+                    const startTime =''
+                    const endDate =''
+                    const endTime = ''
+
+                    return {
+                        ...timing,
+                        startDate,
+                        startTime,
+                        endDate,
+                        endTime
+                    };
+                }
             });
         }
     },
