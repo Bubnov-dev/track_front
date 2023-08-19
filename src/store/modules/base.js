@@ -19,6 +19,7 @@ export default {
       state.timer = timer
       if (timer.start) {
 
+        clearInterval(state.interval)
         state.interval = setInterval(() => {
           ++state.timer.actualSec
         }, 1000)
