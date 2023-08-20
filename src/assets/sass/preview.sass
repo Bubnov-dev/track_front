@@ -10,6 +10,7 @@
     overflow: hidden
     z-index: 10
 
+
     &.active
         width: 350px
         max-width: 30vw
@@ -17,6 +18,10 @@
 
         & ~ div .project__statuses
             padding-right: 350px
+
+
+    .project__tasks
+        padding: 0
 
     & ~ div .project__statuses
         transition: padding 0.5s
@@ -33,10 +38,11 @@
             text-decoration: none
 
     &__content
-        width: 320px
         max-width: 29vw
         padding: 15px
         overflow-y: auto
+        max-height: 100%
+        padding-bottom: 100px
 
     &__button
         width: 24px
@@ -96,10 +102,7 @@
                 padding: 5px
 
         &-form
-            position: absolute
-            bottom: 0
-            left: 0
-            right: 0
+
             padding: 15px
 
             .comment

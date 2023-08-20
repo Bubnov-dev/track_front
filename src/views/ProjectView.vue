@@ -1,5 +1,6 @@
 <script setup>
 import service from "@/service";
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 </script>
 
 <template>
@@ -7,7 +8,7 @@ import service from "@/service";
         <div class="preview" :class="{'active': preview}">
             <div class="preview__content" v-if="previewTask">
                 <div class="preview__header flex align-items-baseline">
-                    <h2>{{ previewTask.current_task.name }}</h2>
+                    <h2>{{ previewTask.name }}</h2>
                     <button class="preview__button" @click="preview = false">
                         <svg class="Icon CloseIcon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                             <path
@@ -16,31 +17,73 @@ import service from "@/service";
                     </button>
                 </div>
                 <router-link @click.stop="" class="preview__link"
-                             :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.current_task.id}}">
+                             :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.id}}">
                     Перейти на страницу задачи
                 </router-link>
                 <div class="preview__description">
-                    {{ previewTask.current_task.description }}
+                    {{ previewTask.description }}
                 </div>
+                <div class="preview__statuses">
 
-                <div class="preview__statuses" v-for="status in previewTask.statuses" :key="status.id">
-                    <div class="preview__status">
-                        <h3 class="project__status-title preview__status-title">{{ status.name }}</h3>
-                        <div class="preview__task"
-                             v-for="task in previewTask.tasks.filter(t => t.status_id == status.id)"
-                             :key="task.id">
-                            {{ task.name }}
-                        </div>
+                    <div class="preview__status" v-for="status in project.statuses" :key="status.id">
+
+                        <draggable
+                            class="project__tasks"
+                            :data-status-id="status.id"
+                            :list="project.tasks.filter(t => t.status_id == status.id && t.task_id == previewTask.id)"
+                            :group="{ name: status.name, put: true, pull: 'clone' }"
+                            :sort="false"
+                            item-key="id"
+                            @end="endStatus"
+                        >
+                            <template #header>
+                                <h3 class="project__status-title preview__status-title">{{ status.name }}</h3>
+                            </template>
+                            <template #item="{ element }" :key="element.id">
+                                <div>
+
+                                    <ProjectTaskCard
+                                        :element="element"
+                                        :timer="timer"
+                                        @request-delete-task="deleteTask"
+                                        @request-show-edit-form="showEditForm"
+                                        @request-rename-task="renameTask"
+                                        @request-open-preview="openPreview"
+                                        @request-open-timer="openTimer"
+                                        @request-start-timer="startTimerTask"
+                                        @request-stop-timer="stopTimer"
+                                    ></ProjectTaskCard>
+
+                                </div>
+                            </template>
+                            <template #footer>
+                                <div class="project__card-new" key="footer">
+                                    <button class="project__card-new-btn btn" @click="showTaskForm">
+                                        <svg width="30" height="25" viewBox="0 0 18 18" fill="none"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M8 14H10V10H14V8H10V4H8V8H4V10H8V14ZM2 18C1.45 18 0.979 17.8043 0.587 17.413C0.195667 17.021 0 16.55 0 16V2C0 1.45 0.195667 0.979 0.587 0.587C0.979 0.195667 1.45 0 2 0H16C16.55 0 17.021 0.195667 17.413 0.587C17.8043 0.979 18 1.45 18 2V16C18 16.55 17.8043 17.021 17.413 17.413C17.021 17.8043 16.55 18 16 18H2ZM2 16H16V2H2V16Z"
+                                                fill="white"/>
+                                        </svg>
+
+                                    </button>
+                                    <form class="project__task-form" @submit.prevent="createTask($event, previewTask.id)">
+                                        <input type="text" placeholder="Новая задача" v-model="newTask.name">
+                                        <input type="hidden" name="status" :value="status.id">
+                                        <button class="btn">Добавить</button>
+                                    </form>
+                                </div>
+                            </template>
+                        </draggable>
                     </div>
                 </div>
-
                 <div class="preview__comments">
                     <h3>Комментарии</h3>
-                    <div class="preview__comment" v-for="com in previewTask.current_task.comments" :key="com.id">
+                    <div class="preview__comment" v-for="com in previewTask.comments" :key="com.id">
                         <div class="comment__header">
 
                             <div class="comment__author">
-                                {{ com.id }}
+                                {{ com.user.name }}
                             </div>
                             <div class="comment__date">
                                 {{ new Date(com.created_at).toLocaleDateString('Ru-ru') }}
@@ -75,7 +118,7 @@ import service from "@/service";
                             <textarea class="comment" v-model="newComment.content" placeholder="Комментарий"
                                       rows="3"></textarea>
                             <button class="preview__button preview__button-comment"
-                                    @click="createComment(previewTask.current_task.id)">
+                                    @click="createComment(previewTask.id)">
                                 <svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiBox-root css-1om0hkc"
                                      focusable="false" aria-hidden="true" viewBox="0 0 24 24"
                                      data-testid="SendRoundedIcon">
@@ -161,85 +204,36 @@ import service from "@/service";
                         <draggable
                             class="project__tasks"
                             :data-status-id="status.id"
-                            :list="project.tasks.filter(t => t.status_id == status.id)"
+                            :list="project.tasks.filter(t => t.status_id == status.id && t.task_id == project.current_task_id)"
                             :group="{ name: status.name, put: true, pull: 'clone' }"
                             :sort="false"
                             item-key="id"
                             @end="endStatus"
                         >
                             <template #header>
-                                <h3 class="project__status-title">{{ status.name }}</h3>
+                                <div class="flex project__status-title">
+                                    <h3 class="">{{ status.name }} : </h3>
+                                    <span class="project__status-time">{{
+                                            service.formatTime(project.tasks.filter(t => t.status_id === status.id && t.task_id === project.current_task_id)
+                                                .reduce((acc, t) => acc + t.time, 0))
+                                        }}</span>
+                                </div>
                             </template>
                             <template #item="{ element }" :key="element.id">
-                                <div class="project__task card">
-                                    <div class="tooltip">
-                                        <button class="project__task-additional tooltip-btn btn">
-                                            <svg width="4" height="16" viewBox="0 0 4 16" fill="none"
-                                                 xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M2 12C2.53043 12 3.03914 12.2107 3.41421 12.5858C3.78929 12.9609 4 13.4696 4 14C4 14.5304 3.78929 15.0391 3.41421 15.4142C3.03914 15.7893 2.53043 16 2 16C1.46957 16 0.96086 15.7893 0.585787 15.4142C0.210714 15.0391 0 14.5304 0 14C0 13.4696 0.210714 12.9609 0.585787 12.5858C0.96086 12.2107 1.46957 12 2 12ZM2 6C2.53043 6 3.03914 6.21071 3.41421 6.58579C3.78929 6.96086 4 7.46957 4 8C4 8.53043 3.78929 9.03914 3.41421 9.41421C3.03914 9.78929 2.53043 10 2 10C1.46957 10 0.96086 9.78929 0.585787 9.41421C0.210714 9.03914 0 8.53043 0 8C0 7.46957 0.210714 6.96086 0.585787 6.58579C0.96086 6.21071 1.46957 6 2 6ZM2 0C2.53043 0 3.03914 0.210714 3.41421 0.585786C3.78929 0.960859 4 1.46957 4 2C4 2.53043 3.78929 3.03914 3.41421 3.41421C3.03914 3.78929 2.53043 4 2 4C1.46957 4 0.96086 3.78929 0.585787 3.41421C0.210714 3.03914 0 2.53043 0 2C0 1.46957 0.210714 0.960859 0.585787 0.585786C0.96086 0.210714 1.46957 0 2 0Z"
-                                                    fill="black"/>
-                                            </svg>
-                                        </button>
-                                        <div class="tooltip-menu">
-                                            <div class="project__additional-menu card"
-                                                 onclick="event.stopPropagation()">
-                                                <div class="project__additional-menu-item">
-                                                    <button class="btn" @click="deleteTask(element.id)">Удалить</button>
-                                                </div>
-                                                <div class="project__additional-menu-item"
-                                                     @click="showEditForm(element)">
-                                                    <button class="btn">Отредактировать</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div>
 
-                                    <form v-if="element.edit == true" class="project__task-rename"
-                                          @submit.prevent="renameTask(element)">
-                                        <input type="text" v-model="element.name">
-                                        <button class="btn btn-primary">сохранить</button>
-                                    </form>
-                                    <template v-else>
-                                        <div class="project__task-content" @click.stop="openPreview(element.id)">
-                                            {{ element.name }}
-                                        </div>
-                                        <div class="project__additional flex">
-                                            <div class="timer" :class="{'active' : element.id == timer.task_id}">
-                                                <!--                                                <router-link @click.stop=""-->
-                                                <!--                                                             :to="{name: 'project', params: {id: project.id}, query: {taskId: element.id}}"-->
-                                                <!--                                                             class="timer__btn timer__btn&#45;&#45;enter">-->
-                                                <!--                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24"-->
-                                                <!--                                                         data-testid="LowPriorityRoundedIcon">-->
-                                                <!--                                                        <path fill="white"-->
-                                                <!--                                                              d="M15 5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm0 5.5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm0 5.5h6c.55 0 1 .45 1 1s-.45 1-1 1h-6c-.55 0-1-.45-1-1s.45-1 1-1zm-5.15 3.15 1.79-1.79c.2-.2.2-.51 0-.71l-1.79-1.79c-.31-.32-.85-.1-.85.35v3.59c0 .44.54.66.85.35zM9 16h-.3c-2.35 0-4.45-1.71-4.68-4.05C3.76 9.27 5.87 7 8.5 7H11c.55 0 1-.45 1-1s-.45-1-1-1H8.5c-3.86 0-6.96 3.4-6.44 7.36C2.48 15.64 5.43 18 8.73 18H9"></path>-->
-                                                <!--                                                    </svg>-->
-                                                <!--                                                </router-link>-->
+                                    <ProjectTaskCard
+                                        :element="element"
+                                        :timer="timer"
+                                        @request-delete-task="deleteTask"
+                                        @request-show-edit-form="showEditForm"
+                                        @request-rename-task="renameTask"
+                                        @request-open-preview="openPreview"
+                                        @request-open-timer="openTimer"
+                                        @request-start-timer="startTimerTask"
+                                        @request-stop-timer="stopTimer"
+                                    ></ProjectTaskCard>
 
-                                                <div class="timer__time" @click="openTimer(element.id, element.time)">
-                                                    {{ service.formatTime(element.time ?? 0) }}
-                                                </div>
-
-                                                <button class="timer__btn timer__btn--start"
-                                                        @click="startTimerTask(element.id)">
-                                                    <svg width="11" height="14" viewBox="0 0 11 14" fill="none"
-                                                         xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M1.525 13.0251C1.19167 13.2417 0.854 13.2541 0.512 13.0621C0.170667 12.8707 0 12.5751 0 12.1751V1.82508C0 1.42508 0.170667 1.12908 0.512 0.93708C0.854 0.745747 1.19167 0.758413 1.525 0.97508L9.675 6.15008C9.975 6.35008 10.125 6.63341 10.125 7.00008C10.125 7.36675 9.975 7.65008 9.675 7.85008L1.525 13.0251Z"
-                                                            fill="white"/>
-                                                    </svg>
-                                                </button>
-                                                <button class="timer__btn timer__btn--stop" @click="stopTimer">
-                                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                                         xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M10 14C9.45 14 8.97933 13.8043 8.588 13.413C8.196 13.021 8 12.55 8 12V2C8 1.45 8.196 0.979333 8.588 0.588C8.97933 0.196 9.45 0 10 0H12C12.55 0 13.021 0.196 13.413 0.588C13.8043 0.979333 14 1.45 14 2V12C14 12.55 13.8043 13.021 13.413 13.413C13.021 13.8043 12.55 14 12 14H10ZM2 14C1.45 14 0.979333 13.8043 0.588 13.413C0.196 13.021 0 12.55 0 12V2C0 1.45 0.196 0.979333 0.588 0.588C0.979333 0.196 1.45 0 2 0H4C4.55 0 5.021 0.196 5.413 0.588C5.80433 0.979333 6 1.45 6 2V12C6 12.55 5.80433 13.021 5.413 13.413C5.021 13.8043 4.55 14 4 14H2Z"
-                                                            fill="white"/>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </template>
                                 </div>
                             </template>
                             <template #footer>
@@ -294,24 +288,28 @@ import service from "@/service";
                         -
                         <div class="datetime-wrapper">
 
-                        <input
-                            type="date"
-                            v-model="timing.endDate"
-                            @change="updateTiming(timing)"
-                        >
-                        <input
-                            type="time"
-                            v-model="timing.endTime"
-                            @change="updateTiming(timing)"
-                        >
+                            <input
+                                type="date"
+                                v-model="timing.endDate"
+                                @change="updateTiming(timing)"
+                            >
+                            <input
+                                type="time"
+                                v-model="timing.endTime"
+                                @change="updateTiming(timing)"
+                            >
                         </div>
 
                         ({{ service.formatTime(timing.time) }})
 
                         <button class="btn-delete" @click="deleteTiming(timing.id)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 6H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19ZM10 11V17M14 11V17" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H21" stroke="black" stroke-width="2" stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                                <path
+                                    d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19ZM10 11V17M14 11V17"
+                                    stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
                     </li>
@@ -342,12 +340,14 @@ import api from "@/api"
 import {useToast} from "vue-toastification";
 import {mapActions, mapGetters} from "vuex";
 import vuedraggable from "vuedraggable/src/vuedraggable";
+import ProjectTaskCard from "@/components/ProjectTaskCard.vue";
 
 export default {
     name: "ProjectView",
 
     components: {
-        draggable: vuedraggable
+        draggable: vuedraggable,
+        ProjectTaskCard: ProjectTaskCard,
     },
 
     mounted() {
@@ -394,11 +394,11 @@ export default {
             timing.end = `${timing.endDate} ${timing.endTime}`;
             api.timer.updateTiming(timing.id, timing.start, timing.end).then(response => {
                 useToast().success('Обновлено')
-                let ti = this.timings.findIndex(el=>el.id === timing.id)
+                let ti = this.timings.findIndex(el => el.id === timing.id)
                 // console.log(ti)
                 // console.log(this.timings[ti])
                 this.timings[ti] = response.data
-            }).catch(()=>{
+            }).catch(() => {
                 useToast().error('Ошибка')
             })
         },
@@ -575,11 +575,15 @@ export default {
             });
         },
 
-        createTask(e) {
+        createTask(e, id = null) {
+            console.log('create task')
             if (!this.newTask.name) {
                 return
             }
-            if (this.project.current_task) {
+            if (id) {
+                this.newTask.task_id = id
+
+            } else if (this.project.current_task) {
                 this.newTask.task_id = this.project.current_task.id
             }
             this.newTask.status_id = e.target.elements['status']._value
@@ -636,15 +640,24 @@ export default {
         stopTimer() {
             api.timer.stop().then(response => {
                 useToast().success('остановлено')
+                let needed_task_id = this.timer.task_id;
+                while (needed_task_id) {
+                    let task = this.project.tasks.find(t => t.id === needed_task_id)
+                    console.log(task)
+                    task.time += this.timer.actualSec
+                    needed_task_id = task.task_id
+                }
+                this.project.time += this.timer.actualSec
                 this.setTimer(response.data)
 
             }).catch(error => {
+                console.log(error)
                 useToast().error('Ошибка')
             });
         },
 
         openPreview(id) {
-            if (!this.preview || this.previewTask.current_task.id == id)
+            if (!this.preview || this.previewTask.id == id)
                 this.preview = !this.preview
             if (this.preview) {
                 let parent_task_id = this.project.id
@@ -652,10 +665,12 @@ export default {
             }
         },
         loadPreview(id) {
-            api.project.get(this.$route.params.id, this.timing_user, id).then((response) => {
-                this.previewTask = response.data
+
+            this.previewTask = this.project.tasks.find(t => t.id === id)
+            api.comments.getByTask(id).then(response => {
+                this.previewTask.comments = response.data
             }).catch(error => {
-                console.log(error)
+                useToast().error('Ошибка получения комментов')
             })
         },
 
@@ -673,7 +688,7 @@ export default {
         },
         updateComment() {
             api.comments.update(this.newComment.id, this.newComment.content).then((response) => {
-                this.loadPreview(this.previewTask.current_task.id)
+                this.loadPreview(this.previewTask.id)
                 this.newComment = {text: ''}
             }).catch((errors) => {
                 console.log(errors)
@@ -681,7 +696,7 @@ export default {
         },
         deleteComment(id) {
             api.comments.delete(id).then((response) => {
-                this.loadPreview(this.previewTask.current_task.id)
+                this.loadPreview(this.previewTask.id)
             }).catch((errors) => {
                 console.log(errors)
             })
@@ -695,7 +710,7 @@ export default {
         }),
         formattedTimings() {
             return this.timings.map(timing => {
-                if  (timing.start && timing.end) {
+                if (timing.start && timing.end) {
                     const startDate = timing.start.split(' ')[0];
                     const startTime = timing.start.split(' ')[1].slice(0, 5);
                     const endDate = timing.end.split(' ')[0];
@@ -708,11 +723,10 @@ export default {
                         endDate,
                         endTime
                     };
-                }
-                else{
-                    const startDate =''
-                    const startTime =''
-                    const endDate =''
+                } else {
+                    const startDate = ''
+                    const startTime = ''
+                    const endDate = ''
                     const endTime = ''
 
                     return {
@@ -740,14 +754,20 @@ export default {
                 if (this.timer.start) {
                     if (this.timer.project_id == this.project.id) {
                         if (this.timer.task_id) {
-                            if (this.project.tasks) {
-                                let task = this.project.tasks.find(el => el.id == this.timer.task_id);
-                                if (task) {
-                                    task.time++
-                                }
-                            }
+                            // let task = null;
+                            // if (this.project.tasks) {
+                            //     task = this.project.tasks.find(el => el.id == this.timer.task_id);
+                            //
+                            // }
+                            // if (!task && this.previewTask && this.previewTask.tasks){
+                            //     task = this.previewTask.tasks.find(el => el.id == this.timer.task_id);
+                            //
+                            // }
+                            // if (task) {
+                            //     task.time++
+                            // }
                         }
-                        this.project.time++;
+                        // this.project.time++;
                     }
                 }
 

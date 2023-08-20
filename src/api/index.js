@@ -110,7 +110,7 @@ export default {
             });
         },
 
-        getTimings(id, timing_user = null){
+        getTimings(id, timing_user = null) {
             return axios.get('/task/timing', {
                 params: {
                     id, timing_user
@@ -118,12 +118,12 @@ export default {
             })
         },
 
-        deleteTiming(id){
-          return axios.delete('/task/timing', {
-              data:{
-                  id
-              }
-          })
+        deleteTiming(id) {
+            return axios.delete('/task/timing', {
+                data: {
+                    id
+                }
+            })
         },
 
         delete(id) {
@@ -189,7 +189,7 @@ export default {
 
         updateTiming(id, start, end) {
             return axios.put('timer/timing', {
-                id,start,end
+                id, start, end
             })
         }
     },
@@ -228,6 +228,14 @@ export default {
         delete(id) {
             return axios.delete('comments', {
                 data: {
+                    id
+                }
+            })
+        },
+
+        getByTask(id) {
+            return axios.get('comments/byTask', {
+                params: {
                     id
                 }
             })
