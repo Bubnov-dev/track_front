@@ -10,7 +10,9 @@
                 </svg>
 
             </div>
-            <slot></slot>
+            <div class="modal__content">
+                <slot></slot>
+            </div>
         </div>
     </div>
 

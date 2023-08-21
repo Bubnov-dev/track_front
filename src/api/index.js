@@ -206,10 +206,8 @@ export default {
             return axios.get('/me');
         },
 
-        updateMe(email, name) {
-            return axios.put('/me', {
-                email, name
-            });
+        updateMe(user) {
+            return axios.put('/me', user);
         }
     },
 

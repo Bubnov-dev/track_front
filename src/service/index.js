@@ -1,4 +1,8 @@
 export default {
+    formatPriceWithSpace(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    },
+
     formatTime(sec) {
         let hours = Math.floor(sec / (60 * 60))
         sec = sec % (60 * 60)

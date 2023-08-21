@@ -67,7 +67,8 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
                                         </svg>
 
                                     </button>
-                                    <form class="project__task-form" @submit.prevent="createTask($event, previewTask.id)">
+                                    <form class="project__task-form"
+                                          @submit.prevent="createTask($event, previewTask.id)">
                                         <input type="text" placeholder="Новая задача" v-model="newTask.name">
                                         <input type="hidden" name="status" :value="status.id">
                                         <button class="btn">Добавить</button>
@@ -213,10 +214,11 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
                             <template #header>
                                 <div class="flex project__status-title">
                                     <h3 class="">{{ status.name }} : </h3>
-                                    <span class="project__status-time">{{
-                                            service.formatTime(project.tasks.filter(t => t.status_id === status.id && t.task_id === project.current_task_id)
-                                                .reduce((acc, t) => acc + t.time, 0))
-                                        }}</span>
+                                    <span class="project__status-time">
+                                    {{ service.formatTime(getTimeOfStatus(status.id).time) }}
+                                        <br>
+                                    {{ service.formatPriceWithSpace(getTimeOfStatus(status.id).totalPrice) }} ₽
+                                    </span>
                                 </div>
                             </template>
                             <template #item="{ element }" :key="element.id">
@@ -389,6 +391,28 @@ export default {
 
     methods: {
         ...mapActions(['setTimer', 'setTitle']),
+
+        getTimeOfStatus(status_id) {
+            let tasks = this.project.tasks.filter(t => t.status_id === status_id && t.task_id === this.project.current_task_id)
+
+            let time = 0;
+            let totalPrice = 0;
+
+            tasks.forEach(t => {
+                t.timings.forEach(timing => {
+                    time += timing.time;
+                    totalPrice += timing.user.price * (timing.time/3600)
+                })
+            })
+
+            totalPrice = Math.floor(totalPrice)
+            return {
+                time,
+                totalPrice
+            };
+
+        },
+
         updateTiming(timing) {
             timing.start = `${timing.startDate} ${timing.startTime}`;
             timing.end = `${timing.endDate} ${timing.endTime}`;
@@ -412,14 +436,6 @@ export default {
 
         openNewUser() {
             this.modals.newUser = true
-        },
-        formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            seconds %= 3600;
-            const minutes = Math.floor(seconds / 60);
-            seconds %= 60;
-
-            return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         },
         saveNewUser() {
             api.project.inviteUser(this.project.id, this.newUser.email, this.newUser.role).then(response => {
@@ -458,16 +474,11 @@ export default {
             this.modals.newUser = true
         },
 
-        openTimer(task_id, time) {
+        openTimer(task, time) {
             this.modals.timer = true;
-            console.log(task_id)
-            this.currentTimer.task_id = task_id
+            this.currentTimer.task_id = task.id
             this.currentTimer.time = time
-            api.task.getTimings(task_id, this.timing_user).then((response) => {
-                this.timings = response.data
-            }).catch(() => {
-                useToast().error("Ошибка получения истории таймера")
-            })
+            this.timings = task.timings
         },
 
         updateTimer() {
@@ -641,14 +652,18 @@ export default {
             api.timer.stop().then(response => {
                 useToast().success('остановлено')
                 let needed_task_id = this.timer.task_id;
+                let task = this.project.tasks.find(t => t.id === needed_task_id)
+
+                console.log(response.data.timing)
+                task.timings.push(response.data.timing)
                 while (needed_task_id) {
-                    let task = this.project.tasks.find(t => t.id === needed_task_id)
+                    task = this.project.tasks.find(t => t.id === needed_task_id)
                     console.log(task)
                     task.time += this.timer.actualSec
                     needed_task_id = task.task_id
                 }
                 this.project.time += this.timer.actualSec
-                this.setTimer(response.data)
+                this.setTimer(response.data.timer)
 
             }).catch(error => {
                 console.log(error)
@@ -709,6 +724,9 @@ export default {
             title: 'getTitle'
         }),
         formattedTimings() {
+            if(!this.timings){
+                return []
+            }
             return this.timings.map(timing => {
                 if (timing.start && timing.end) {
                     const startDate = timing.start.split(' ')[0];

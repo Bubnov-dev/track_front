@@ -14,6 +14,8 @@
                            :error="v$.user.name.$errors.length ? v$.user.name.$errors[0].$message : ''"/>
                 <InputView placeholder="E-mail" v-model="user.email" inputClass="big"
                            :error="v$.user.email.$errors.length ? v$.user.email.$errors[0].$message : ''"/>
+                <InputView placeholder="Цена за час" v-model="user.price" inputClass="big"
+                           :error="v$.user.email.$errors.length ? v$.user.email.$errors[0].$message : ''"/>
                 <div class="input flex">
                     <button class="btn btn-primary ms-auto" @click="saveChanges">
                         Сохранить
@@ -78,6 +80,7 @@ export default {
             user: {
                 name: '',
                 email: '',
+                price: 0,
             },
 
             password: {
@@ -109,13 +112,14 @@ export default {
                 console.log(response.data.name)
                 this.user.name = response.data.name
                 this.user.email = response.data.email
+                this.user.price = response.data.price
             }).catch(error => {
                 console.log(error)
             })
         },
 
         saveChanges() {
-            api.user.updateMe(this.user.email, this.user.name).then((response) => {
+            api.user.updateMe(this.user).then((response) => {
                 console.log(response)
             }).catch(error => {
                 console.log(error)
