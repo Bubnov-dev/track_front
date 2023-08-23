@@ -26,7 +26,7 @@
 
                         <div class="project__additional-menu card" onclick="event.stopPropagation()">
                             <div class="project__additional-menu-item">
-                                <button class="btn" @click="deleteProject(project.id)">Удалить</button>
+                                <button class="btn" @click="deleteProject(project.id)">Удалить <spinner-component :show="loading.saved"/> </button>
                             </div>
                             <div class="project__additional-menu-item" @click.stop="">
                                 <button class="btn">Отредактировать</button>
@@ -76,7 +76,7 @@
                         </div>
                     </template>
                 </draggable>
-                <button class="btn btn-primary">Сохранить</button>
+                <button class="btn btn-primary">Сохранить <spinner-component :show="loading.saved"/> </button>
             </form>
 
         </modal-component>
@@ -92,11 +92,13 @@ import {mapActions} from "vuex";
 import vuedraggable from "vuedraggable/src/vuedraggable";
 import {useToast} from "vue-toastification";
 import InputView from "../components/InputView.vue";
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
 export default {
     name: 'projects-view',
 
     components: {
+      SpinnerComponent,
         InputView,
         CheckboxView,
         ModalComponent,
@@ -122,8 +124,13 @@ export default {
                 { name: "Joao", id: 1 },
                 { name: "Jean", id: 2 }
             ],
-            dragging: false
+            dragging: false,
+            loading: {
+              saved: false,
+            }
         }
+
+
     },
 
     mounted() {
@@ -137,6 +144,7 @@ export default {
         ...mapActions(['setTitle']),
 
         createProject(){
+            this.loading.saved = true;
             for(let i = 0; i < this.newProject.statuses.length; i++){
                 this.newProject.statuses[i].order = i+1
             }
@@ -146,15 +154,20 @@ export default {
                 this.closeModal()
             }).catch(error => {
                 console.log(error)
+            }).finally(()=>{
+              this.loading.saved = false;
             })
         },
 
         deleteProject(id){
+            this.loading.saved = true;
             api.project.delete(id).then(response => {
                 this.projects = this.projects.filter(el => el.id !== id)
             }).catch(error => {
                 console.log(error)
                 useToast().error('Ошибка удаления')
+            }).finally(()=>{
+              this.loading.saved = false;
             })
         },
 

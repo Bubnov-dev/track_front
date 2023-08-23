@@ -18,7 +18,7 @@
                            :error="v$.user.email.$errors.length ? v$.user.email.$errors[0].$message : ''"/>
                 <div class="input flex">
                     <button class="btn btn-primary ms-auto" @click="saveChanges">
-                        Сохранить
+                        Сохранить <spinner-component :show="loading.saved"/>
                     </button>
                 </div>
             </form>
@@ -26,7 +26,7 @@
                 <InputView placeholder="Пароль" v-model="password.password" inputClass="big" typeProp="password"
                            :error="v$.password.password.$errors.length ? v$.password.password.$errors[0].$message : ''"/>
                 <InputView placeholder="Повторите пароль" v-model="password.password_confirmation" inputClass="big"
-                           type="password"
+                           typeProp="password"
                            :error="v$.password.password_confirmation.$errors.length ? v$.password.password_confirmation.$errors[0].$message : ''"/>
                 <div class="input flex">
                     <button class="btn btn-primary ms-auto" @click="saveChanges">
@@ -57,11 +57,14 @@ import api from "../api"
 
 import useValidate from '@vuelidate/core'
 import {required, email, minLength, requiredIf, sameAs} from '@vuelidate/validators'
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
+import {set} from "vuedraggable/dist/vuedraggable.common";
 
 export default {
     name: "ProfileView",
 
     components: {
+      SpinnerComponent,
         ModalComponent,
         InputView,
     },
@@ -86,6 +89,9 @@ export default {
             password: {
                 password: '',
                 password_confirmation: '',
+            },
+            loading: {
+                saved: false
             },
 
             changePasswordModal: false,
@@ -119,11 +125,16 @@ export default {
         },
 
         saveChanges() {
+            this.loading.saved = true;
             api.user.updateMe(this.user).then((response) => {
                 console.log(response)
             }).catch(error => {
                 console.log(error)
+            }).finally(()=>{
+              this.loading.saved = false;
             })
+
+
         },
         changePassword() {
 

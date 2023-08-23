@@ -102,7 +102,7 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
                                 <div class="project__additional-menu card" onclick="event.stopPropagation()">
                                     <div class="project__additional-menu-item">
-                                        <button class="btn" @click="deleteComment(com.id)">Удалить</button>
+                                        <button class="btn" @click="deleteComment(com.id)">Удалить <spinner-component :show="loading.deleted"/></button>
                                     </div>
                                     <div class="project__additional-menu-item">
                                         <button class="btn" @click="newComment=com">Редактировать</button>
@@ -120,6 +120,7 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
                                       rows="3"></textarea>
                             <button class="preview__button preview__button-comment"
                                     @click="createComment(previewTask.id)">
+                                    <spinner-component :show="loading.saved"/>
                                 <svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiBox-root css-1om0hkc"
                                      focusable="false" aria-hidden="true" viewBox="0 0 24 24"
                                      data-testid="SendRoundedIcon">
@@ -133,7 +134,7 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
             </div>
         </div>
         <div class="project__loading" v-if="loading.project">
-            loading...
+            loading... <spinner-component :show="loading.project" :size = "65"/>
         </div>
         <div class="project__content" v-else>
             <div class="project__parent-task" v-if="project.current_task">
@@ -368,7 +369,9 @@ export default {
             newUser: {},
             newComment: {},
             loading: {
-                project: true
+                project: true,
+                saved : false,
+                deleted: false,
             },
 
             myArray: [],
@@ -386,6 +389,7 @@ export default {
 
             preview: false,
             previewTask: null,
+
         }
     },
 
@@ -690,6 +694,7 @@ export default {
         },
 
         createComment(task_id) {
+            this.loading.saved = true;
             if (this.newComment.id) {
                 this.updateComment()
             } else {
@@ -698,22 +703,30 @@ export default {
                     this.newComment.content = ''
                 }).catch((errors) => {
                     console.log(errors)
+                }).finally(()=>{
+                  this.loading.saved = false;
                 })
             }
         },
         updateComment() {
+            this.loading.saved = true;
             api.comments.update(this.newComment.id, this.newComment.content).then((response) => {
                 this.loadPreview(this.previewTask.id)
                 this.newComment = {text: ''}
             }).catch((errors) => {
                 console.log(errors)
+            }).finally(()=>{
+              this.loading.saved = false;
             })
         },
         deleteComment(id) {
+            this.loading.deleted = true;
             api.comments.delete(id).then((response) => {
                 this.loadPreview(this.previewTask.id)
             }).catch((errors) => {
                 console.log(errors)
+            }).finally(()=>{
+              this.loading.deleted = false;
             })
         }
     },
