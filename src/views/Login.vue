@@ -30,7 +30,7 @@
           <InputView placeholder="Пароль" v-model="reg_user.password" inputClass="big" typeProp="password"
                      :error="v$.reg_user.password.$errors.length ? v$.reg_user.password.$errors[0].$message : ''"/>
           <InputView placeholder="Повторите пароль" v-model="reg_user.password_confirmation" inputClass="big"
-                     type="password"
+                     typeProp="password"
                      :error="v$.reg_user.password_confirmation.$errors.length ? v$.reg_user.password_confirmation.$errors[0].$message : ''"/>
 
           <button class="btn btn-primary" @click="register">
