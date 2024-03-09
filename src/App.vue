@@ -24,7 +24,7 @@ import {useToast} from "vue-toastification";
 export default {
 
     methods: {
-        ...mapActions(['setApiToken', 'setTimer', 'setTime', 'setUser'])
+        ...mapActions(['setApiToken', 'setTimer', 'setTime', 'setUser', 'setUserId'])
     },
 
     mounted() {
@@ -50,17 +50,20 @@ export default {
                 this.setTimer(response.data)
 
 
-            }).catch(() => {
-                useToast().error('Ошибка')
+            }).catch((error) => {
+              if (error.response && error.response.status === 401) {
+                this.$router.push('/login')
+              }
             });
-
-            api.user.me().then(response => {
-                this.setUser(response.data.name)
-            })
         } else {
             this.$router.push('/login')
         }
 
+        api.user.me().then(response => {
+          this.setUser(response.data.name)
+          console.log(response.data.id)
+          this.setUserId(response.data.id)
+        })
 
     },
 

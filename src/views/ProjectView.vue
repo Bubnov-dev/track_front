@@ -6,23 +6,24 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
 <template>
     <div class="project">
         <div class="preview" :class="{'active': preview}">
+          <button class="preview__button preview__close" @click="preview = false">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="6" y1="6" x2="18" y2="18" stroke="black" stroke-width="2"/>
+              <line x1="6" y1="18" x2="18" y2="6" stroke="black" stroke-width="2"/>
+            </svg>
+
+          </button>
             <div class="preview__content" v-if="previewTask">
                 <div class="preview__header flex align-items-baseline">
-                    <h2>{{ previewTask.name }}</h2>
-                    <button class="preview__button" @click="preview = false">
-                        <svg class="Icon CloseIcon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-                            <path
-                                d="M2,14.5h18.4l-7.4-7.4c-0.6-0.6-0.6-1.5,0-2.1c0.6-0.6,1.5-0.6,2.1,0l10,10c0.6,0.6,0.6,1.5,0,2.1l-10,10c-0.3,0.3-0.7,0.4-1.1,0.4c-0.4,0-0.8-0.1-1.1-0.4c-0.6-0.6-0.6-1.5,0-2.1l7.4-7.4H2c-0.8,0-1.5-0.7-1.5-1.5C0.5,15.3,1.2,14.5,2,14.5z M28,3.5C28,2.7,28.7,2,29.5,2S31,2.7,31,3.5v25c0,0.8-0.7,1.5-1.5,1.5S28,29.3,28,28.5V3.5z"></path>
-                        </svg>
-                    </button>
+                    <h2><router-link @click.stop="" class="link"
+                                     :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.id}}">{{ previewTask.name }} - <span class="preview__link">Перейти</span></router-link></h2>
+
                 </div>
-                <router-link @click.stop="" class="preview__link"
-                             :to="{name: 'project', params: {id: project.id}, query: {taskId: previewTask.id}}">
-                    Перейти на страницу задачи
-                </router-link>
                 <div class="preview__description">
                     {{ previewTask.description }}
                 </div>
+              <span class="mt-3">Создана: {{ new Date(previewTask.created_at).toLocaleDateString('ru')}}</span>
+
                 <div class="preview__statuses">
 
                     <div class="preview__status" v-for="status in project.statuses" :key="status.id">
@@ -163,7 +164,8 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
                         <h4>Время</h4>
                         <span>{{ service.formatTime(project.time ?? 0) }}</span>
                     </div>
-                    <div class="flex align-items-baseline">
+
+                    <div v-if="project.role == 'admin'" class="flex align-items-baseline">
                         <h4 class="mt-0">Чье</h4>
                         <select class="form-select" v-model="timing_user" @change="getProject">
                             <option value="all">Общее</option>
@@ -174,12 +176,12 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
                     </div>
                 </div>
 
-                <div>
+                <div v-if="project.role == 'admin'">
                     <h4>Пользователи</h4>
                     <div class="flex project__users">
                         <div class="card p-2 flex" :class="{'cp':projectUser.id != project.user_id}"
                              v-for="projectUser in project.users" :key="projectUser.id"
-                             @click="if(projectUser.id != project.user_id)
+                             @click="
                               openUpdateUser(projectUser);">
                             {{ projectUser.name }}
                             <button class="btn" v-if="projectUser.id != project.user_id"
@@ -217,10 +219,11 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
                                     <span class="project__status-time">
                                     {{ service.formatTime(getTimeOfStatus(status.id).time) }}
                                         <br>
-                                    {{ service.formatPriceWithSpace(getTimeOfStatus(status.id).totalPrice) }} ₽
+                                    {{ service.formatPriceWithSpace(getTimeOfStatus(status.id).totalPrice) }} {{ project.currency_sign}}
                                     </span>
                                 </div>
                             </template>
+
                             <template #item="{ element }" :key="element.id">
                                 <div>
 
@@ -238,6 +241,7 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
                                 </div>
                             </template>
+
                             <template #footer>
                                 <div class="project__card-new" key="footer">
                                     <button class="project__card-new-btn btn" @click="showTaskForm">
@@ -325,11 +329,32 @@ import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
                     <select class="form-select pb-1 pt-1" v-model="newUser.role">
                         <option value="observer">observer</option>
-                        <option value="worker">worker</option>
+                        <option value="worker" selected>worker</option>
                         <option value="admin">admin</option>
                     </select>
-                    <input class="p-1 fs-1rem" type="email" v-model="newUser.email">
+                    <input class="p-1 fs-1rem" type="email" v-model="newUser.email" placeholder="email ">
                 </div>
+                <button class="btn btn-primary">Сохранить</button>
+
+            </form>
+        </modal-component>
+
+        <modal-component v-model="modals.updateUser">
+            {{ updateUser.name }}
+            <form @submit.prevent="saveUpdateUser" class="form">
+                <div class="flex">
+                    Роль:
+                    <select class="form-select pb-1 pt-1" v-model="updateUser.role">
+                        <option value="observer">observer</option>
+                        <option value="worker" selected>worker</option>
+                        <option value="admin">admin</option>
+                    </select>
+
+                    Цена:
+                    <input type="text" v-model="updateUser.price">
+                </div>
+
+
                 <button class="btn btn-primary">Сохранить</button>
 
             </form>
@@ -343,6 +368,7 @@ import {useToast} from "vue-toastification";
 import {mapActions, mapGetters} from "vuex";
 import vuedraggable from "vuedraggable/src/vuedraggable";
 import ProjectTaskCard from "@/components/ProjectTaskCard.vue";
+// import service from "@/service";
 
 export default {
     name: "ProjectView",
@@ -360,12 +386,14 @@ export default {
         return {
             modals: {
                 timer: false,
-                newUser: false
+                newUser: false,
+                updateUser: false
             },
             timing_user: null,
             project: {},
             newTask: {},
             newUser: {},
+            updateUser: {},
             newComment: {},
             loading: {
                 project: true
@@ -392,6 +420,20 @@ export default {
     methods: {
         ...mapActions(['setTimer', 'setTitle']),
 
+        getUserPrice(id){
+          let projectUser = this.project.users.find(user => user.id == id);
+          let price = 0;
+          if (projectUser == undefined) {
+            return 0
+          }
+          if (projectUser.pivot) {
+            price = projectUser.pivot.price
+          } else {
+            price = projectUser.price
+          }
+          return price
+        },
+
         getTimeOfStatus(status_id) {
             let tasks = this.project.tasks.filter(t => t.status_id === status_id && t.task_id === this.project.current_task_id)
 
@@ -399,13 +441,17 @@ export default {
             let totalPrice = 0;
 
             tasks.forEach(t => {
+
                 t.timings.forEach(timing => {
-                    time += timing.time;
-                    totalPrice += timing.user.price * (timing.time/3600)
+                  time += timing.time;
+                  totalPrice += this.getUserPrice(timing.user.id) * (timing.time / 3600)
                 })
+
             })
 
-            totalPrice = Math.floor(totalPrice)
+            totalPrice = totalPrice.toFixed(1)
+
+          // totalPrice = Math.floor(totalPrice)
             return {
                 time,
                 totalPrice
@@ -449,10 +495,10 @@ export default {
                 useToast().error('Ошибка')
             })
         },
-        updateUser() {
-            api.project.updateUser(this.project.id, this.newUser.email, this.newUser.role).then(response => {
+        saveUpdateUser() {
+            api.project.updateUser(this.project.id, this.updateUser.id, this.updateUser.role, this.updateUser.price ).then(response => {
                 if (response.data) {
-                    this.modals.newUser = false
+                    this.modals.updateUser = false
                 } else {
                     throw Error;
                 }
@@ -470,8 +516,11 @@ export default {
             })
         },
         openUpdateUser(user) {
-            this.newUser = user
-            this.modals.newUser = true
+          console.log(user)
+            this.updateUser = user
+            this.updateUser.role = user.pivot.role
+            this.updateUser.price = this.getUserPrice(user.id)
+            this.modals.updateUser = true
         },
 
         openTimer(task, time) {
@@ -520,6 +569,13 @@ export default {
                 parent_task_id = this.$route.query.taskId
             }
 
+
+            if (this.timing_user == null){
+              this.timing_user = localStorage.getItem('userId')
+            }
+
+
+
             api.project.get(this.$route.params.id, this.timing_user, parent_task_id).then((response) => {
                 console.log(response.data)
                 this.project = response.data
@@ -542,8 +598,6 @@ export default {
                     }
                 }
 
-                if (this.timing_user == null)
-                    this.timing_user = this.project.user_id
             }).catch(error => {
                 console.log(error)
             })
@@ -601,6 +655,7 @@ export default {
             this.newTask.project_id = this.project.id
             api.task.create(this.newTask).then(response => {
                 console.log(response.data)
+                let task = response.data
                 this.project.tasks.push(response.data)
                 this.newTask = {}
             }).catch(error => {
@@ -654,7 +709,8 @@ export default {
                 let needed_task_id = this.timer.task_id;
                 let task = this.project.tasks.find(t => t.id === needed_task_id)
 
-                console.log(response.data.timing)
+
+                response.data.timing.end =  new Date(response.data.timing.end).toISOString().replace('T', ' ').substring(0, 19);
                 task.timings.push(response.data.timing)
                 while (needed_task_id) {
                     task = this.project.tasks.find(t => t.id === needed_task_id)
@@ -721,7 +777,8 @@ export default {
     computed: {
         ...mapGetters({
             timer: 'getTimer',
-            title: 'getTitle'
+            title: 'getTitle',
+            userId: 'getUserId',
         }),
         formattedTimings() {
             if(!this.timings){
@@ -732,6 +789,7 @@ export default {
                     const startDate = timing.start.split(' ')[0];
                     const startTime = timing.start.split(' ')[1].slice(0, 5);
                     const endDate = timing.end.split(' ')[0];
+                    console.log(timing.end.split(' '))
                     const endTime = timing.end.split(' ')[1].slice(0, 5);
 
                     return {

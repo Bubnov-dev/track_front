@@ -8,7 +8,7 @@ import service from "@/service";
             <div class="main-menu">
                 <router-link to="/" class="main-menu__logo">
                     <h1>
-                        L O G O
+                        N_T I M E
                     </h1>
                     <!--                     <img src="@/assets/logo.png" alt="">-->
                 </router-link>

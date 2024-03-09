@@ -138,7 +138,9 @@ export default {
 
           this.$router.push({name: 'projects'})
         }).catch( (msg) => {
-          useToast().error('Произошла непредвиденная ошибка')
+          useToast().error('Произошла ошибка')
+          console.log(msg)
+          useToast().error(msg.response.data.message)
           console.log(msg)
         }).finally(()=>{
           this.loading.auth = false

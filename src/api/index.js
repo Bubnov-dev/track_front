@@ -77,11 +77,12 @@ export default {
             });
         },
 
-        updateUser(project_id, user_id, role) {
+        updateUser(project_id, user_id, role, price) {
             return axios.put('/project/managerUser', {
                 project_id,
                 user_id,
-                role
+                role,
+                price
             });
         }
 

@@ -54,6 +54,7 @@
         <modal-component v-model="testModal" title="Новый проект">
             <form @submit.prevent="createProject">
                 <input-view type="text" placeholder="Название" v-model="newProject.name" inputClass="big"/>
+                <input-view type="text" placeholder="знак валюты" v-model="newProject.currency_sign" inputClass="big"/>
                 <div class="flex justify-content-between">
                     <span class="fs-075rem">Статусы</span>
                     <div class="cp" @click.stop="newProject.statuses.push({})">+</div>
